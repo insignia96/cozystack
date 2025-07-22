@@ -3,9 +3,9 @@
 ## @param host The hostname used to access the SeaweedFS externally (defaults to 's3' subdomain for the tenant host).
 host: ""
 
-## @param topology The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone)
+## @param topology The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone, External)
 ##
-topology: Simple
+topology: External
 
 ## @param replicationFactor The number of replicas for each volume in the SeaweedFS cluster.
 replicationFactor: 2
@@ -31,3 +31,8 @@ storageClass: ""
 ##     replicas: 2
 ##     size: 10Gi
 zones: {}
+
+
+#remoteClients:
+#  asd: 
+#    kubeconfig: ""

@@ -31,7 +31,8 @@
       "type": "string",
       "enum": [
         "Simple",
-        "MultiZone"
+        "MultiZone",
+        "External"
       ]
     },
     "zones": {
