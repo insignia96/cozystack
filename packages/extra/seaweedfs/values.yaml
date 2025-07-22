@@ -5,7 +5,7 @@ host: ""
 
 ## @param topology The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone, External)
 ##
-topology: External
+topology: Simple
 
 ## @param replicationFactor The number of replicas for each volume in the SeaweedFS cluster.
 replicationFactor: 2
@@ -32,7 +32,23 @@ storageClass: ""
 ##     size: 10Gi
 zones: {}
 
-
-#remoteClients:
-#  asd: 
-#    kubeconfig: ""
+## @param externalClients A map of external clusters for managing bucketclaims.
+## Example:
+## externalClients:
+##   cluster1: 
+##     cluster: "https://api.example.org"
+##     namespace: "tenant-root"
+##     ca: |
+##       -----BEGIN CERTIFICATE-----
+##       MIIBijCCATCgAwIBAgIRAMg6nrACqxg97aDuhzrpqGMwCgYIKoZIzj0EAwIwFTET
+##       MBEGA1UEChMKa3ViZXJuZXRlczAeFw0yNTA1MTUwNzE5MTBaFw0zNTA1MTMwNzE5
+##       MTBaMBUxEzARBgNVBAoTCmt1YmVybmV0ZXMwWTATBgcqhkjOPQIBBggqhkjOPQMB
+##       BwNCAATh2nTL8tglw2cHO3/QSMqsiP4Ws8UIxNxjG5MtmIx4E7EH9fJjcpx6Ncfg
+##       Ekq6lbeTi6KpQOksAvhiq/EcwLLUo2EwXzAOBgNVHQ8BAf8EBAMCAoQwHQYDVR0l
+##       BBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0O
+##       BBYEFEwtnxdCdotUI1cbgsszGHM/nbUuMAoGCCqGSM49BAMCA0gAMEUCIQCA785y
+##       6H6l8T1r0HjhAkHqWWYpuPj8lhiSqG0aXinWPgIgPksSKIRTnVyiQ/w5pWMnKuBD
+##       QFq6nUXbcO+ABY439FU=
+##       -----END CERTIFICATE-----
+##     token: "eyJhbGciOiJSUzI1NiIsImtpZCI6IlJMaEMyMTVvdDVVSENqZ1EySEFtVUhobnp2Mi02RXJ4bWM0bDJVenJmYzgifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ0ZW5hbnQtcm9vdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJ0ZW5hbnQtcm9vdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJ0ZW5hbnQtcm9vdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImQ4OWRmN2M0LTI1OTctNGQ0NS1hM2U4LTIzMWVhYTJiN2U5NCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDp0ZW5hbnQtcm9vdDp0ZW5hbnQtcm9vdCJ9.eIFJwuT5q4nxgsTraxTw7cnaMiKaOOTpFazSf_LKS_gE9KO6AC5WvitFFIMudnm_0XrYMrMbjoBvtNf3khzmy-n5WSmmlxyZj0RKUUgoWnVjwy2pq0xLiZWSzbrHKnDpfyYUgz6Qz-LcqNK5O6Mnkd5xpz2FrY3vdjLJJ90f3cKFewI3GksvI6F7NG7ANSdhI0xBVKCCsIGoQL1m7ieTQtJoS9p4HtlfTBFOHj6NCu4Sai-2z-CC_cVxYQLCPD3fsYTpF4MZGMunDHaHadMVmvBZrHyBdH4OcrCGJ2ZtXBOsxxYRq8SHsGP7M5T_jwZ8j66BtJ_d3-3Aij-lorX2dpmwBLcc1yR5Pxgh1bwjRn_04oM30s6xlVcpupAfTvs4WpApADKsV3RixLTYNf18mTCpZL6phbw3TWSRSD0Gz-08QkROWvB2IJqsya65BPnSfab5eFumYvYiZVn84mHhh7BxSuRXBTTGAYzQ-D6t1V7W2sSPF191lrSkYkxwQ_rtyi4EfDqayD2D4pFGWJJhqSM7Ra4ZsAy9TpSTfKtWsIwngwnGn7zXsWKPIYGP8Xyt-97nWum4qvgHQAPBa0SofxI7dKHiZ1KKo-vOuKdL0Qka0_E-h_3w1w3Gn6-q1X8qp5YNB-fHooYYGeL8kFiBjRacB1QSAGAuBwaKl37xB4U"
+externalClients: {}

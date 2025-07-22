@@ -1,0 +1,159 @@
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
+{{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
+{{- range $clientName, $client := .Values.externalClients }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Release.Name }}-objectstorage-provisioner-{{ $clientName }}
+  namespace: {{ $client.namespace }}
+  labels:
+    app.kubernetes.io/component: objectstorage-provisioner-{{ $clientName }}
+    app.kubernetes.io/instance: seaweedfs
+    app.kubernetes.io/name: {{ $.Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: objectstorage-provisioner-{{ $clientName }}
+      app.kubernetes.io/instance: seaweedfs
+      app.kubernetes.io/name: {{ $.Release.Name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: objectstorage-provisioner-{{ $clientName }}
+        app.kubernetes.io/instance: seaweedfs
+        app.kubernetes.io/name: {{ $.Release.Name }}
+    spec:
+      containers:
+      - name: seaweedfs-cosi-driver
+        image: ghcr.io/seaweedfs/seaweedfs-cosi-driver:v0.1.2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DRIVERNAME
+          value: {{ printf "%s.seaweedfs.objectstorage.k8s.io" $client.namespace }}
+        - name: ENDPOINT
+          value: https://{{ $.Values.host | default (printf "s3.%s" $host) }}
+        - name: SEAWEEDFS_FILER
+          value: seaweedfs-filer:18888
+        - name: WEED_GRPC_CLIENT_KEY
+          value: /usr/local/share/ca-certificates/client/tls.key
+        - name: WEED_GRPC_CLIENT_CERT
+          value: /usr/local/share/ca-certificates/client/tls.crt
+        - name: WEED_GRPC_CA
+          value: /usr/local/share/ca-certificates/client/ca.crt
+        - name: WEED_CLUSTER_DEFAULT
+          value: sw
+        - name: WEED_CLUSTER_SW_FILER
+          value: seaweedfs-filer-client:8888
+        - name: WEED_CLUSTER_SW_MASTER
+          value: seaweedfs-master:9333
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - mountPath: /var/lib/cosi
+          name: socket
+        - mountPath: /etc/seaweedfs/security.toml
+          name: security-config
+          readOnly: true
+          subPath: security.toml
+        - mountPath: /usr/local/share/ca-certificates/ca/
+          name: ca-cert
+          readOnly: true
+        - mountPath: /usr/local/share/ca-certificates/master/
+          name: master-cert
+          readOnly: true
+        - mountPath: /usr/local/share/ca-certificates/volume/
+          name: volume-cert
+          readOnly: true
+        - mountPath: /usr/local/share/ca-certificates/filer/
+          name: filer-cert
+          readOnly: true
+        - mountPath: /usr/local/share/ca-certificates/client/
+          name: client-cert
+          readOnly: true
+      - name: seaweedfs-cosi-sidecar
+        image: ghcr.io/cozystack/cozystack/objectstorage-sidecar
+        imagePullPolicy: IfNotPresent
+        args:
+        - --v=5
+        env:
+        - name: KUBECONFIG
+          value: /kubeconfig
+        - name: POD_NAMESPACE
+          value: {{ $client.namespace }}
+        volumeMounts:
+        - mountPath: /var/lib/cosi
+          name: socket
+        - mountPath: /kubeconfig
+          name: kubeconfig
+          subPath: kubeconfig
+          readOnly: true
+      enableServiceLinks: false
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: socket
+      - configMap:
+          name: {{ $.Release.Name }}-security-config
+        name: security-config
+      - name: ca-cert
+        secret:
+          secretName: {{ $.Release.Name }}-ca-cert
+      - name: master-cert
+        secret:
+          secretName: {{ $.Release.Name }}-master-cert
+      - name: volume-cert
+        secret:
+          secretName: {{ $.Release.Name }}-volume-cert
+      - name: filer-cert
+        secret:
+          secretName: {{ $.Release.Name }}-filer-cert
+      - name: client-cert
+        secret:
+          secretName: {{ $.Release.Name }}-client-cert
+      - name: kubeconfig
+        secret:
+          secretName: {{ $.Release.Name }}-objectstorage-provisioner-{{ $clientName }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-objectstorage-provisioner-{{ $clientName }}
+  labels:
+    app.kubernetes.io/component: objectstorage-provisioner-{{ $clientName }}
+    app.kubernetes.io/instance: seaweedfs
+    app.kubernetes.io/name: {{ $.Release.Name }}
+stringData:
+  kubeconfig: |
+    apiVersion: v1
+    clusters:
+    - cluster:
+        certificate-authority-data: {{ $client.ca | b64enc | quote }}
+        server: {{ $client.cluster | quote }}
+      name: {{ $clientName }}
+    contexts:
+    - context:
+        cluster: {{ $clientName }}
+        namespace: {{ $client.namespace }}
+        user: {{ $clientName }}
+      name: {{ $clientName }}
+    current-context: {{ $clientName }}
+    kind: Config
+    preferences: {}
+    users:
+    - name: {{ $clientName }}
+      user:
+        token: {{ $client.token | quote }}
+{{- end }}

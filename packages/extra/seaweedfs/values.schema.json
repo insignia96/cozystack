@@ -1,5 +1,10 @@
 {
   "properties": {
+    "externalClients": {
+      "default": {},
+      "description": "A map of external clusters for managing bucketclaims.",
+      "type": "object"
+    },
     "host": {
       "default": "",
       "description": "The hostname used to access the SeaweedFS externally (defaults to 's3' subdomain for the tenant host).",
@@ -27,7 +32,7 @@
     },
     "topology": {
       "default": "Simple",
-      "description": "The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone)",
+      "description": "The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone, External)",
       "type": "string",
       "enum": [
         "Simple",

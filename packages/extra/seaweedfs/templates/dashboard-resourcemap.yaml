@@ -3,6 +3,32 @@ kind: Role
 metadata:
   name: {{ .Release.Name }}-dashboard-resources
 rules:
+{{- if not (eq .Values.topology "External") }}
+- apiGroups:
+  - ""
+  resources:
+  - services
+  resourceNames:
+  - {{ $.Release.Name }}-s3
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  resourceNames:
+  - ingress-{{ $.Release.Name }}-s3
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - cozystack.io
+  resources:
+  - workloadmonitors
+  resourceNames:
+  - {{ $.Release.Name }}-master
+  - {{ $.Release.Name }}-filer
+  - {{ $.Release.Name }}-volume
+  - {{ $.Release.Name }}-db
+  verbs: ["get", "list", "watch"]
+{{- else }}
 - apiGroups:
   - ""
   resources:
@@ -10,6 +36,8 @@ rules:
   resourceNames:
   - {{ .Release.Namespace }}-seaweedfs-objectstorage-provisioner
   verbs: ["get", "list", "watch"]
+{{- end }}
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -17,6 +45,18 @@ metadata:
   name: {{ .Release.Name }}-dashboard-resources
 subjects:
 {{ include "cozy-lib.rbac.subjectsForTenantAndAccessLevel" (list "admin" .Release.Namespace) }}
+roleRef:
+  kind: Role
+  name: {{ .Release.Name }}-dashboard-resources
+  apiGroup: rbac.authorization.k8s.io
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Release.Name }}-dashboard-resources
+subjects:
+{{ include "cozy-lib.rbac.subjectsForTenantAndAccessLevel" (list "super-admin" .Release.Namespace) }}
 roleRef:
   kind: Role
   name: {{ .Release.Name }}-dashboard-resources
