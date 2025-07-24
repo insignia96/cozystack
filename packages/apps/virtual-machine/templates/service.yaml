@@ -13,7 +13,7 @@ metadata:
 spec:
   type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
   externalTrafficPolicy: Local
-  allocateLoadBalancerNodePorts: false
+  allocateLoadBalancerNodePorts: true
   selector:
     {{- include "virtual-machine.selectorLabels" . | nindent 4 }}
   ports:

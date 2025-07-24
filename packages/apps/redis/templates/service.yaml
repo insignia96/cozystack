@@ -11,7 +11,7 @@ spec:
   type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
   {{- if .Values.external }}
   externalTrafficPolicy: Local
-  allocateLoadBalancerNodePorts: false
+  allocateLoadBalancerNodePorts: true
   {{- end }}
   selector:
     app.kubernetes.io/component: redis
