@@ -1,5 +1,26 @@
 {
   "properties": {
+    "filer": {
+      "properties": {
+        "grpcHost": {
+          "default": "",
+          "description": "The hostname used to expose or access the filer service externally.",
+          "type": "string"
+        },
+        "grpcPort": {
+          "default": 443,
+          "description": "The port used to access the filer service externally.",
+          "type": "number"
+        },
+        "whitelist": {
+          "default": [],
+          "description": "A list of IP addresses or CIDR ranges that are allowed to access the filer service.",
+          "items": {},
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
     "host": {
       "default": "",
       "description": "The hostname used to access the SeaweedFS externally (defaults to 's3' subdomain for the tenant host).",
@@ -27,11 +48,12 @@
     },
     "topology": {
       "default": "Simple",
-      "description": "The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone)",
+      "description": "The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone, Client)",
       "type": "string",
       "enum": [
         "Simple",
-        "MultiZone"
+        "MultiZone",
+        "Client"
       ]
     },
     "zones": {

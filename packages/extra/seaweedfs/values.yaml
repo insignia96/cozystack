@@ -3,7 +3,7 @@
 ## @param host The hostname used to access the SeaweedFS externally (defaults to 's3' subdomain for the tenant host).
 host: ""
 
-## @param topology The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone)
+## @param topology The topology of the SeaweedFS cluster. (allowed values: Simple, MultiZone, Client)
 ##
 topology: Simple
 
@@ -31,3 +31,11 @@ storageClass: ""
 ##     replicas: 2
 ##     size: 10Gi
 zones: {}
+
+## @param filer.grpcHost The hostname used to expose or access the filer service externally.
+## @param filer.grpcPort The port used to access the filer service externally.
+## @param filer.whitelist A list of IP addresses or CIDR ranges that are allowed to access the filer service.
+filer:
+  grpcHost: ""
+  grpcPort: 443
+  whitelist: []
