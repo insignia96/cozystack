@@ -1,3 +1,3 @@
 objectstorage:
   controller:
-    image: "ghcr.io/cozystack/cozystack/objectstorage-controller:v0.34.3@sha256:2fe77880b81b0210273c85a142cb13e6857d13dd941337456b426597f5778bc3"
+    image: "ghcr.io/cozystack/cozystack/objectstorage-controller:v0.34.4@sha256:e1b7b313fc00653d9515aa5ff90c6feb9fd0a4aaf140cbe9a1cf8baf02e44823"
