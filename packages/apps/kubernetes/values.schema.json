@@ -73,22 +73,6 @@
     "nodeGroups": {
       "description": "Worker nodes configuration",
       "type": "object",
-      "default": {
-        "md0": {
-          "ephemeralStorage": "20Gi",
-          "gpus": {},
-          "instanceType": "u1.medium",
-          "maxReplicas": 10,
-          "minReplicas": 0,
-          "resources": {
-            "cpu": "",
-            "memory": ""
-          },
-          "roles": [
-            "ingress-nginx"
-          ]
-        }
-      },
       "additionalProperties": {
         "type": "object",
         "required": [
