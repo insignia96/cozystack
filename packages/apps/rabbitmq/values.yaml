@@ -38,8 +38,8 @@ users: {}
 ## @param vhosts {map[string]vhost} Virtual Hosts configuration
 ## @param vhost {vhost} Virtual Host
 ## @field vhost.roles {roles} Virtual host roles list
-## @field roles.admin {[]*string} List of admin users
-## @field roles.readonly {[]*string} List of readonly users
+## @field roles.admin {[]string} List of admin users
+## @field roles.readonly {[]string} List of readonly users
 ##
 ## Example:
 ## vhosts:

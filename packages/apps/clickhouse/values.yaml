@@ -45,14 +45,14 @@ users: {}
 ## @section Backup parameters
 
 ## @param backup {backup} Backup configuration
-## @field backup.enabled {*bool} Enable regular backups, default is `false`
-## @field backup.s3Region {*string} AWS S3 region where backups are stored
-## @field backup.s3Bucket {*string} S3 bucket used for storing backups
-## @field backup.schedule {*string} Cron schedule for automated backups
-## @field backup.cleanupStrategy {*string} Retention strategy for cleaning up old backups
-## @field backup.s3AccessKey {*string} Access key for S3, used for authentication
-## @field backup.s3SecretKey {*string} Secret key for S3, used for authentication
-## @field backup.resticPassword {*string} Password for Restic backup encryption
+## @field backup.enabled {bool} Enable regular backups, default is `false`
+## @field backup.s3Region {string} AWS S3 region where backups are stored
+## @field backup.s3Bucket {string} S3 bucket used for storing backups
+## @field backup.schedule {string} Cron schedule for automated backups
+## @field backup.cleanupStrategy {string} Retention strategy for cleaning up old backups
+## @field backup.s3AccessKey {string} Access key for S3, used for authentication
+## @field backup.s3SecretKey {string} Secret key for S3, used for authentication
+## @field backup.resticPassword {string} Password for Restic backup encryption
 backup:
   enabled: false
   s3Region: us-east-1

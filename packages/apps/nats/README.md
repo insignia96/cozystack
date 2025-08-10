@@ -28,8 +28,8 @@ It provides a data layer for cloud native applications, IoT messaging, and micro
 | `jetstream.enabled`    | Enable or disable Jetstream. Set to `true` (default) to enable Jetstream for persistent messaging in NATS.     | `bool`              | `true`  |
 | `jetstream.size`       | Jetstream persistent storage size. Specifies the size of the persistent storage for Jetstream (message store). | `quantity`          | `10Gi`  |
 | `config`               | NATS configuration                                                                                             | `object`            | `{}`    |
-| `config.merge`         | Additional configuration to merge into NATS config (see example)                                               | `*object`           | `null`  |
-| `config.resolver`      | Additional resolver configuration to merge into NATS config (see example)                                      | `object`            | `{}`    |
+| `config.merge`         | Additional configuration to merge into NATS config (see example)                                               | `*object`           | `{}`    |
+| `config.resolver`      | Additional resolver configuration to merge into NATS config (see example)                                      | `*object`           | `{}`    |
 
 
 ## Parameter examples and reference

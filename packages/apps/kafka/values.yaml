@@ -11,7 +11,7 @@ external: false
 ## @field topic.name {string} Topic name
 ## @field topic.partitions {int} Number of partitions
 ## @field topic.replicas {int} Number of replicas
-## @field topic.config {map[string]object} Topic configuration
+## @field topic.config {object} Topic configuration
 ## Example:
 ## topics:
 ##   - name: Results
@@ -37,8 +37,8 @@ kafka:
   ## @field kafka.replicas {int} Number of Kafka replicas
   replicas: 3
   ## @field kafka.resources {*resources} Explicit CPU and memory configuration for each replica. When left empty, the preset defined in `resourcesPreset` is applied.
-  ## @field kafka.resources.cpu {*quantity} CPU
-  ## @field kafka.resources.memory {*quantity} Memory
+  ## @field resources.cpu {*quantity} CPU
+  ## @field resources.memory {*quantity} Memory
   # resources:
   #   cpu: 4000m
   #   memory: 4Gi
@@ -58,8 +58,6 @@ zookeeper:
   ## @field zookeeper.replicas {int} Number of ZooKeeper replicas
   replicas: 3
   ## @field zookeeper.resources {*resources} Explicit CPU and memory configuration for each replica. When left empty, the preset defined in `resourcesPreset` is applied.
-  ## @field zookeeper.resources.cpu {*quantity} CPU
-  ## @field zookeeper.resources.memory {*quantity} Memory
   # resources:
   #   cpu: 4000m
   #   memory: 4Gi

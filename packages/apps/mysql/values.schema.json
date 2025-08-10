@@ -15,6 +15,16 @@
         "s3SecretKey": "ju3eum4dekeich9ahM1te8waeGai0oog",
         "schedule": "0 2 * * *"
       },
+      "required": [
+        "cleanupStrategy",
+        "enabled",
+        "resticPassword",
+        "s3AccessKey",
+        "s3Bucket",
+        "s3Region",
+        "s3SecretKey",
+        "schedule"
+      ],
       "properties": {
         "cleanupStrategy": {
           "description": "Retention strategy for cleaning up old backups",

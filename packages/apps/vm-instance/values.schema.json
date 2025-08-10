@@ -3,7 +3,8 @@
   "type": "object",
   "properties": {
     "cloudInit": {
-      "description": "cloud-init user data config. See cloud-init documentation for more details: [format](https://cloudinit.readthedocs.io/en/latest/explanation/format.html), [examples](https://cloudinit.readthedocs.io/en/latest/explanation/format.html)."
+      "description": "cloud-init user data config. See cloud-init documentation for more details: [format](https://cloudinit.readthedocs.io/en/latest/explanation/format.html), [examples](https://cloudinit.readthedocs.io/en/latest/explanation/format.html).",
+      "type": "string"
     },
     "cloudInitSeed": {
       "description": "A seed string to generate an SMBIOS UUID for the VM.",

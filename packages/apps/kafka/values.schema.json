@@ -9,12 +9,91 @@
     },
     "kafka": {
       "description": "Kafka configuration",
+      "type": "object",
       "default": {
         "replicas": 3,
         "resources": {},
         "resourcesPreset": "small",
         "size": "10Gi",
         "storageClass": ""
+      },
+      "required": [
+        "replicas",
+        "resourcesPreset",
+        "size",
+        "storageClass"
+      ],
+      "properties": {
+        "replicas": {
+          "description": "Number of Kafka replicas",
+          "type": "integer",
+          "default": 3
+        },
+        "resources": {
+          "description": "Explicit CPU and memory configuration for each replica. When left empty, the preset defined in `resourcesPreset` is applied.",
+          "type": "object",
+          "default": {},
+          "properties": {
+            "cpu": {
+              "description": "CPU",
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "x-kubernetes-int-or-string": true
+            },
+            "memory": {
+              "description": "Memory",
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "x-kubernetes-int-or-string": true
+            }
+          }
+        },
+        "resourcesPreset": {
+          "description": "Default sizing preset used when `resources` is omitted. Allowed values: `nano`, `micro`, `small`, `medium`, `large`, `xlarge`, `2xlarge`.",
+          "type": "string",
+          "default": "small",
+          "enum": [
+            "nano",
+            "micro",
+            "small",
+            "medium",
+            "large",
+            "xlarge",
+            "2xlarge"
+          ]
+        },
+        "size": {
+          "description": "Persistent Volume size for Kafka",
+          "default": "10Gi",
+          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "x-kubernetes-int-or-string": true
+        },
+        "storageClass": {
+          "description": "StorageClass used to store the Kafka data",
+          "type": "string"
+        }
       }
     },
     "topics": {
@@ -24,6 +103,7 @@
       "items": {
         "type": "object",
         "required": [
+          "config",
           "name",
           "partitions",
           "replicas"
@@ -32,10 +112,7 @@
           "config": {
             "description": "Topic configuration",
             "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "x-kubernetes-preserve-unknown-fields": true
-            }
+            "x-kubernetes-preserve-unknown-fields": true
           },
           "name": {
             "description": "Topic name",
@@ -54,12 +131,91 @@
     },
     "zookeeper": {
       "description": "Zookeeper configuration",
+      "type": "object",
       "default": {
         "replicas": 3,
         "resources": {},
         "resourcesPreset": "small",
         "size": "5Gi",
         "storageClass": ""
+      },
+      "required": [
+        "replicas",
+        "resourcesPreset",
+        "size",
+        "storageClass"
+      ],
+      "properties": {
+        "replicas": {
+          "description": "Number of ZooKeeper replicas",
+          "type": "integer",
+          "default": 3
+        },
+        "resources": {
+          "description": "Explicit CPU and memory configuration for each replica. When left empty, the preset defined in `resourcesPreset` is applied.",
+          "type": "object",
+          "default": {},
+          "properties": {
+            "cpu": {
+              "description": "CPU",
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "x-kubernetes-int-or-string": true
+            },
+            "memory": {
+              "description": "Memory",
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "x-kubernetes-int-or-string": true
+            }
+          }
+        },
+        "resourcesPreset": {
+          "description": "Default sizing preset used when `resources` is omitted. Allowed values: `nano`, `micro`, `small`, `medium`, `large`, `xlarge`, `2xlarge`.",
+          "type": "string",
+          "default": "small",
+          "enum": [
+            "nano",
+            "micro",
+            "small",
+            "medium",
+            "large",
+            "xlarge",
+            "2xlarge"
+          ]
+        },
+        "size": {
+          "description": "Persistent Volume size for ZooKeeper",
+          "default": "5Gi",
+          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "x-kubernetes-int-or-string": true
+        },
+        "storageClass": {
+          "description": "StorageClass used to store the ZooKeeper data",
+          "type": "string"
+        }
       }
     }
   }

@@ -15,6 +15,23 @@
 | `machines[i].ip.address.address` | IP address                                           | `string`   | `""`    |
 | `machines[i].ip.address.gateway` | IP gateway                                           | `string`   | `""`    |
 | `machines[i].ip.address.netmask` | Netmask                                              | `string`   | `""`    |
+| `machines[i].ip.address.address` | IP address                                           | `string`   | `""`    |
+| `machines[i].ip.address.gateway` | IP gateway                                           | `string`   | `""`    |
+| `machines[i].ip.address.netmask` | Netmask                                              | `string`   | `""`    |
+| `machines[i].leaseTime`          | Lease time                                           | `int`      | `0`     |
+| `machines[i].mac`                | MAC addresses                                        | `[]string` | `[]`    |
+| `machines[i].nameServers`        | Name servers                                         | `[]string` | `[]`    |
+| `machines[i].timeServers`        | Time servers                                         | `[]string` | `[]`    |
+| `machines[i].uefi`               | UEFI                                                 | `bool`     | `false` |
+| `machines[i].hostname`           | Hostname                                             | `string`   | `""`    |
+| `machines[i].arch`               | Architecture                                         | `string`   | `""`    |
+| `machines[i].ip.address`         | IP address                                           | `object`   | `{}`    |
+| `machines[i].ip.address.address` | IP address                                           | `string`   | `""`    |
+| `machines[i].ip.address.gateway` | IP gateway                                           | `string`   | `""`    |
+| `machines[i].ip.address.netmask` | Netmask                                              | `string`   | `""`    |
+| `machines[i].ip.address.address` | IP address                                           | `string`   | `""`    |
+| `machines[i].ip.address.gateway` | IP gateway                                           | `string`   | `""`    |
+| `machines[i].ip.address.netmask` | Netmask                                              | `string`   | `""`    |
 | `machines[i].leaseTime`          | Lease time                                           | `int`      | `0`     |
 | `machines[i].mac`                | MAC addresses                                        | `[]string` | `[]`    |
 | `machines[i].nameServers`        | Name servers                                         | `[]string` | `[]`    |

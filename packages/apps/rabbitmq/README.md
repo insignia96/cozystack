@@ -33,12 +33,12 @@ The service utilizes official RabbitMQ operator. This ensures the reliability an
 | `users[name].password`        | Password for the user       | `*string`           | `null`  |
 | `vhosts`                      | Virtual Hosts configuration | `map[string]object` | `{...}` |
 | `vhosts[name].roles`          | Virtual host roles list     | `object`            | `{}`    |
-| `vhosts[name].roles.admin`    | List of admin users         | `[]*string`         | `[]`    |
-| `vhosts[name].roles.readonly` | List of readonly users      | `[]*string`         | `[]`    |
+| `vhosts[name].roles.admin`    | List of admin users         | `[]string`          | `[]`    |
+| `vhosts[name].roles.readonly` | List of readonly users      | `[]string`          | `[]`    |
 | `vhost`                       | Virtual Host                | `object`            | `{}`    |
 | `vhost.roles`                 | Virtual host roles list     | `object`            | `{}`    |
-| `vhost.roles.admin`           | List of admin users         | `[]*string`         | `[]`    |
-| `vhost.roles.readonly`        | List of readonly users      | `[]*string`         | `[]`    |
+| `vhost.roles.admin`           | List of admin users         | `[]string`          | `[]`    |
+| `vhost.roles.readonly`        | List of readonly users      | `[]string`          | `[]`    |
 
 
 ## Parameter examples and reference

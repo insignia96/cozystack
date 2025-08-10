@@ -15,7 +15,12 @@
 | `zones`                | A map of zones for MultiZone topology. Each zone can have its own number of replicas and size.         | `map[string]object` | `{...}`  |
 | `zones[name].replicas` | Number of replicas in the zone                                                                         | `int`               | `0`      |
 | `zones[name].size`     | Zone storage size                                                                                      | `quantity`          | `""`     |
+| `zones[name].replicas` | Number of replicas in the zone                                                                         | `int`               | `0`      |
+| `zones[name].size`     | Zone storage size                                                                                      | `quantity`          | `""`     |
 | `filer`                | Filer service configuration                                                                            | `*object`           | `{}`     |
+| `filer.grpcHost`       | The hostname used to expose or access the filer service externally.                                    | `*string`           | `""`     |
+| `filer.grpcPort`       | The port used to access the filer service externally.                                                  | `*int`              | `443`    |
+| `filer.whitelist`      | A list of IP addresses or CIDR ranges that are allowed to access the filer service.                    | `[]*string`         | `[]`     |
 | `filer.grpcHost`       | The hostname used to expose or access the filer service externally.                                    | `*string`           | `""`     |
 | `filer.grpcPort`       | The port used to access the filer service externally.                                                  | `*int`              | `443`    |
 | `filer.whitelist`      | A list of IP addresses or CIDR ranges that are allowed to access the filer service.                    | `[]*string`         | `[]`     |

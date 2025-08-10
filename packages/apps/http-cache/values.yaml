@@ -28,8 +28,8 @@ haproxy:
   ## @field haproxy.replicas {int} Number of HAProxy replicas
   replicas: 2
   ## @field haproxy.resources {resources} Explicit CPU and memory configuration for each replica. When left empty, the preset defined in `resourcesPreset` is applied.
-  ## @field haproxy.resources.cpu {*quantity} CPU
-  ## @field haproxy.resources.memory {*quantity} Memory
+  ## @field resources.cpu {*quantity} CPU
+  ## @field resources.memory {*quantity} Memory
   resources: {}
   # resources:
   #   cpu: 4000m
@@ -44,8 +44,6 @@ nginx:
   ## @field nginx.replicas {int} Number of Nginx replicas
   replicas: 2
   ## @field nginx.resources {*resources} Explicit CPU and memory configuration for each replica. When left empty, the preset defined in `resourcesPreset` is applied.
-  ## @field nginx.resources.cpu {*quantity} CPU
-  ## @field nginx.resources.memory {*quantity} Memory
   # resources:
   #   cpu: 4000m
   #   memory: 4Gi

@@ -72,6 +72,8 @@ See:
 | `resources`        | Explicit CPU and memory configuration for each PostgreSQL replica. When left empty, the preset defined in `resourcesPreset` is applied.   | `*object`   | `{}`    |
 | `resources.cpu`    | CPU                                                                                                                                       | `*quantity` | `null`  |
 | `resources.memory` | Memory                                                                                                                                    | `*quantity` | `null`  |
+| `resources.cpu`    | CPU                                                                                                                                       | `*quantity` | `null`  |
+| `resources.memory` | Memory                                                                                                                                    | `*quantity` | `null`  |
 | `resourcesPreset`  | Default sizing preset used when `resources` is omitted. Allowed values: `nano`, `micro`, `small`, `medium`, `large`, `xlarge`, `2xlarge`. | `string`    | `micro` |
 | `size`             | Persistent Volume Claim size, available for application data                                                                              | `quantity`  | `10Gi`  |
 | `storageClass`     | StorageClass used to store the data                                                                                                       | `string`    | `""`    |
@@ -85,14 +87,30 @@ See:
 | `postgresql`                            | PostgreSQL server configuration                                                                                          | `object`            | `{}`    |
 | `postgresql.parameters`                 | PostgreSQL server parameters                                                                                             | `object`            | `{}`    |
 | `postgresql.parameters.max_connections` | Determines the maximum number of concurrent connections to the database server. The default is typically 100 connections | `int`               | `100`   |
+| `postgresql.parameters.max_connections` | Determines the maximum number of concurrent connections to the database server. The default is typically 100 connections | `int`               | `100`   |
+| `postgresql.parameters`                 | PostgreSQL server parameters                                                                                             | `object`            | `{}`    |
+| `postgresql.parameters.max_connections` | Determines the maximum number of concurrent connections to the database server. The default is typically 100 connections | `int`               | `100`   |
+| `postgresql.parameters.max_connections` | Determines the maximum number of concurrent connections to the database server. The default is typically 100 connections | `int`               | `100`   |
 | `quorum`                                | Quorum configuration for synchronous replication                                                                         | `object`            | `{}`    |
+| `quorum.minSyncReplicas`                | Minimum number of synchronous replicas that must acknowledge a transaction before it is considered committed.            | `int`               | `0`     |
+| `quorum.maxSyncReplicas`                | Maximum number of synchronous replicas that can acknowledge a transaction (must be lower than the number of instances).  | `int`               | `0`     |
 | `quorum.minSyncReplicas`                | Minimum number of synchronous replicas that must acknowledge a transaction before it is considered committed.            | `int`               | `0`     |
 | `quorum.maxSyncReplicas`                | Maximum number of synchronous replicas that can acknowledge a transaction (must be lower than the number of instances).  | `int`               | `0`     |
 | `users`                                 | Users configuration                                                                                                      | `map[string]object` | `{...}` |
 | `users[name].password`                  | Password for the user                                                                                                    | `*string`           | `null`  |
 | `users[name].replication`               | Whether the user has replication privileges                                                                              | `*bool`             | `null`  |
+| `users[name].password`                  | Password for the user                                                                                                    | `*string`           | `null`  |
+| `users[name].replication`               | Whether the user has replication privileges                                                                              | `*bool`             | `null`  |
 | `databases`                             | Databases configuration                                                                                                  | `map[string]object` | `{...}` |
 | `databases[name].roles`                 | Roles for the database                                                                                                   | `*object`           | `null`  |
+| `databases[name].roles.admin`           | List of users with admin privileges                                                                                      | `[]string`          | `[]`    |
+| `databases[name].roles.readonly`        | List of users with read-only privileges                                                                                  | `[]string`          | `[]`    |
+| `databases[name].roles.admin`           | List of users with admin privileges                                                                                      | `[]string`          | `[]`    |
+| `databases[name].roles.readonly`        | List of users with read-only privileges                                                                                  | `[]string`          | `[]`    |
+| `databases[name].extensions`            | Extensions enabled for the database                                                                                      | `[]string`          | `[]`    |
+| `databases[name].roles`                 | Roles for the database                                                                                                   | `*object`           | `null`  |
+| `databases[name].roles.admin`           | List of users with admin privileges                                                                                      | `[]string`          | `[]`    |
+| `databases[name].roles.readonly`        | List of users with read-only privileges                                                                                  | `[]string`          | `[]`    |
 | `databases[name].roles.admin`           | List of users with admin privileges                                                                                      | `[]string`          | `[]`    |
 | `databases[name].roles.readonly`        | List of users with read-only privileges                                                                                  | `[]string`          | `[]`    |
 | `databases[name].extensions`            | Extensions enabled for the database                                                                                      | `[]string`          | `[]`    |
@@ -110,6 +128,13 @@ See:
 | `backup.endpointURL`     | S3 Endpoint used to upload data to the cloud               | `*string` | `http://minio-gateway-service:9000` |
 | `backup.s3AccessKey`     | Access key for S3, used for authentication                 | `*string` | `<access key>`                      |
 | `backup.s3SecretKey`     | Secret key for S3, used for authentication                 | `*string` | `<secret key>`                      |
+| `backup.enabled`         | Enable regular backups                                     | `*bool`   | `false`                             |
+| `backup.schedule`        | Cron schedule for automated backups                        | `*string` | `0 2 * * * *`                       |
+| `backup.retentionPolicy` | Retention policy                                           | `*string` | `30d`                               |
+| `backup.destinationPath` | Path to store the backup (i.e. s3://bucket/path/to/folder) | `*string` | `s3://bucket/path/to/folder/`       |
+| `backup.endpointURL`     | S3 Endpoint used to upload data to the cloud               | `*string` | `http://minio-gateway-service:9000` |
+| `backup.s3AccessKey`     | Access key for S3, used for authentication                 | `*string` | `<access key>`                      |
+| `backup.s3SecretKey`     | Secret key for S3, used for authentication                 | `*string` | `<secret key>`                      |
 
 
 ### Bootstrap (recovery) parameters
@@ -117,6 +142,9 @@ See:
 | Name                     | Description                                                                                                          | Type      | Value   |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
 | `bootstrap`              | Bootstrap configuration                                                                                              | `object`  | `{}`    |
+| `bootstrap.enabled`      | Restore database cluster from a backup                                                                               | `bool`    | `false` |
+| `bootstrap.recoveryTime` | Timestamp (PITR) up to which recovery will proceed, expressed in RFC 3339 format. If left empty, will restore latest | `*string` | `""`    |
+| `bootstrap.oldName`      | Name of database cluster before deleting                                                                             | `string`  | `""`    |
 | `bootstrap.enabled`      | Restore database cluster from a backup                                                                               | `bool`    | `false` |
 | `bootstrap.recoveryTime` | Timestamp (PITR) up to which recovery will proceed, expressed in RFC 3339 format. If left empty, will restore latest | `*string` | `""`    |
 | `bootstrap.oldName`      | Name of database cluster before deleting                                                                             | `string`  | `""`    |
