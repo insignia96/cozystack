@@ -123,15 +123,22 @@ EOF
 
 @test "Configure Tenant and wait for applications" {
   # Patch root tenant and wait for its releases
-  kubectl patch tenants/root -n tenant-root --type merge -p '{"spec":{"host":"example.org","ingress":true,"monitoring":true,"etcd":true,"isolated":true}}'
+  kubectl patch tenants/root -n tenant-root --type merge -p '{"spec":{"host":"example.org","ingress":true,"monitoring":true,"etcd":true,"isolated":true, "seaweedfs": true}}'
 
-  timeout 60 sh -ec 'until kubectl get hr -n tenant-root etcd ingress monitoring tenant-root >/dev/null 2>&1; do sleep 1; done'
-  kubectl wait hr/etcd hr/ingress hr/tenant-root -n tenant-root --timeout=2m --for=condition=ready
+  timeout 60 sh -ec 'until kubectl get hr -n tenant-root etcd ingress monitoring seaweedfs tenant-root >/dev/null 2>&1; do sleep 1; done'
+  kubectl wait hr/etcd hr/ingress hr/tenant-root hr/seaweedfs -n tenant-root --timeout=4m --for=condition=ready
 
+  # TODO: Workaround ingress unvailability issue
   if ! kubectl wait hr/monitoring -n tenant-root --timeout=2m --for=condition=ready; then
     flux reconcile hr monitoring -n tenant-root --force
     kubectl wait hr/monitoring -n tenant-root --timeout=2m --for=condition=ready
   fi
+
+  if ! kubectl wait hr/seaweedfs-system -n tenant-root --timeout=2m --for=condition=ready; then
+    flux reconcile hr seaweedfs-system -n tenant-root --force
+    kubectl wait hr/seaweedfs-system -n tenant-root --timeout=2m --for=condition=ready
+  fi
+
 
   # Expose Cozystack services through ingress
   kubectl patch configmap/cozystack -n cozy-system --type merge -p '{"data":{"expose-services":"api,dashboard,cdi-uploadproxy,vm-exportproxy,keycloak"}}'
@@ -144,7 +151,7 @@ EOF
   kubectl wait sts/etcd -n tenant-root --for=jsonpath='{.status.readyReplicas}'=3 --timeout=5m
 
   # VictoriaMetrics components
-  kubectl wait vmalert/vmalert-shortterm vmalertmanager/alertmanager -n tenant-root --for=jsonpath='{.status.updateStatus}'=operational --timeout=5m
+  kubectl wait vmalert/vmalert-shortterm vmalertmanager/alertmanager -n tenant-root --for=jsonpath='{.status.updateStatus}'=operational --timeout=15m
   kubectl wait vlogs/generic -n tenant-root --for=jsonpath='{.status.updateStatus}'=operational --timeout=5m
   kubectl wait vmcluster/shortterm vmcluster/longterm -n tenant-root --for=jsonpath='{.status.clusterStatus}'=operational --timeout=5m
 

@@ -5,12 +5,8 @@ include ../../../scripts/common-envs.mk
 include ../../../scripts/package.mk
 
 generate:
-	readme-generator -v values.yaml -s values.schema.json -r README.md
-	yq -o json -i '.properties.addons.properties.ingressNginx.properties.exposeMethod.enum = ["Proxied","LoadBalancer"]' values.schema.json
-	yq -o json -i '.properties.controlPlane.properties.apiServer.properties.resourcesPreset.enum = ["none","nano","micro","small","medium","large","xlarge","2xlarge"]' values.schema.json
-	yq -o json -i '.properties.controlPlane.properties.controllerManager.properties.resourcesPreset.enum = ["none","nano","micro","small","medium","large","xlarge","2xlarge"]' values.schema.json
-	yq -o json -i '.properties.controlPlane.properties.scheduler.properties.resourcesPreset.enum = ["none","nano","micro","small","medium","large","xlarge","2xlarge"]' values.schema.json
-	yq -o json -i '.properties.controlPlane.properties.konnectivity.properties.server.properties.resourcesPreset.enum = ["none","nano","micro","small","medium","large","xlarge","2xlarge"]' values.schema.json
+	cozyvalues-gen -v values.yaml -s values.schema.json -r README.md
+	yq -o=json -i '.properties.version.enum = (load("files/versions.yaml") | keys)' values.schema.json
 
 image: image-ubuntu-container-disk image-kubevirt-cloud-provider image-kubevirt-csi-driver image-cluster-autoscaler
 

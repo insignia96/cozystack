@@ -33,6 +33,7 @@ const requestedAt = "reconcile.fluxcd.io/requestedAt"
 
 func (r *CozystackConfigReconciler) Reconcile(ctx context.Context, _ ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
+	time.Sleep(2 * time.Second)
 
 	digest, err := r.computeDigest(ctx)
 	if err != nil {
@@ -54,6 +55,7 @@ func (r *CozystackConfigReconciler) Reconcile(ctx context.Context, _ ctrl.Reques
 		if !isSystemApp && !isTenantRoot {
 			continue
 		}
+		patchTarget := hr.DeepCopy()
 
 		if hr.Annotations == nil {
 			hr.Annotations = map[string]string{}
@@ -62,13 +64,12 @@ func (r *CozystackConfigReconciler) Reconcile(ctx context.Context, _ ctrl.Reques
 		if hr.Annotations[digestAnnotation] == digest {
 			continue
 		}
+		patchTarget.Annotations[digestAnnotation] = digest
+		patchTarget.Annotations[forceReconcileKey] = now
+		patchTarget.Annotations[requestedAt] = now
 
 		patch := client.MergeFrom(hr.DeepCopy())
-		hr.Annotations[digestAnnotation] = digest
-		hr.Annotations[forceReconcileKey] = now
-		hr.Annotations[requestedAt] = now
-
-		if err := r.Patch(ctx, &hr, patch); err != nil {
+		if err := r.Patch(ctx, patchTarget, patch); err != nil {
 			log.Error(err, "failed to patch HelmRelease", "name", hr.Name, "namespace", hr.Namespace)
 			continue
 		}

@@ -22,9 +22,7 @@ image-nginx:
 	rm -f images/nginx-cache.json
 
 generate:
-	readme-generator -v values.yaml -s values.schema.json -r README.md
-	yq -i -o json --indent 4 '.properties.haproxy.properties.resourcesPreset.enum = ["none", "nano", "micro", "small", "medium", "large", "xlarge", "2xlarge"]' values.schema.json
-	yq -i -o json --indent 4 '.properties.nginx.properties.resourcesPreset.enum = ["none", "nano", "micro", "small", "medium", "large", "xlarge", "2xlarge"]' values.schema.json
+	cozyvalues-gen -v values.yaml -s values.schema.json -r README.md
 
 update:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/chrislim2888/IP2Location-C-Library | awk -F'[/^]' 'END{print $$3}') && \
