@@ -41,8 +41,8 @@ clusterApi:
 
 3. Install the chart:
 ```bash
-helm install proxmox-integration cozystack/proxmox-integration \
-  --namespace proxmox-integration \
+helm install proxmox-ve cozystack/proxmox-ve \
+  --namespace cozy-proxmox-ve \
   --create-namespace \
   --values my-values.yaml
 ```
@@ -105,7 +105,7 @@ Kamaji integration is handled by the CozyStack platform. This chart focuses on t
 ## Uninstallation
 
 ```bash
-helm uninstall proxmox-integration --namespace proxmox-integration
+helm uninstall proxmox-ve --namespace cozy-proxmox-ve
 ```
 
 ## Troubleshooting
@@ -131,7 +131,7 @@ helm uninstall proxmox-integration --namespace proxmox-integration
 
 ```bash
 # Check all components
-kubectl get pods -A -l app.kubernetes.io/instance=proxmox-integration
+kubectl get pods -A -l app.kubernetes.io/instance=proxmox-ve
 
 # Check Cluster API
 kubectl get clusters
