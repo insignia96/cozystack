@@ -1,357 +1,357 @@
 # Sprint Timeline: Proxmox Integration
 
-## 📅 Загальний Timeline
+## 📅 Overall Timeline
 
-**Sprint Duration**: 14 днів (2 тижні)  
-**Start Date**: 2024-01-15  
-**End Date**: 2024-01-29  
+**Sprint Duration**: 14 days (2 weeks)  
+**Start Date**: 2025-09-15 (after proxmox-lxcri completion)  
+**End Date**: 2025-09-29  
 
-## 🗓️ Детальний план по днях
+## 🗓️ Detailed Day-by-Day Plan
 
-### Тиждень 1: Підготовка та базова інтеграція
+### Week 1: Preparation and Basic Integration
 
-#### День 1 (Понеділок, 15.01.2024)
-**Phase 1.1: Аналіз поточної інфраструктури**
+#### Day 1 (Monday, 15.09.2025)
+**Phase 1.1: Current Infrastructure Analysis**
 
-**Ранок (9:00-12:00)**
-- [ ] Оцінка Proxmox сервера
-  - Перевірка версії та ресурсів
-  - Аналіз мережевої конфігурації
-  - Валідація SSL сертифікатів
-- [ ] Оцінка CozyStack кластера
-  - Перевірка Kubernetes версії
-  - Аналіз наявних компонентів
+**Morning (9:00-12:00)**
+- [ ] Proxmox Server Assessment
+  - Check version and resources
+  - Analyze network configuration
+  - Validate SSL certificates
+- [ ] CozyStack Cluster Assessment
+  - Check Kubernetes version
+  - Analyze existing components
 
-**День (13:00-17:00)**
-- [ ] Підготовка тестового середовища
-  - Копіювання тестових скриптів
-  - Налаштування config.env
-  - Встановлення залежностей
+**Afternoon (13:00-17:00)**
+- [ ] Test Environment Preparation
+  - Copy test scripts
+  - Configure config.env
+  - Install dependencies
 
-**Вечір (17:00-18:00)**
-- [ ] Документування результатів
-- [ ] Планування на наступний день
+**Evening (17:00-18:00)**
+- [ ] Document results
+- [ ] Plan next day
 
-#### День 2 (Вівторок, 16.01.2024)
-**Phase 1.2: Підготовка тестових ресурсів**
+#### Day 2 (Tuesday, 16.09.2025)
+**Phase 1.2: Test Resources Preparation**
 
-**Ранок (9:00-12:00)**
-- [ ] Створення тестових namespace'ів
-- [ ] Підготовка VM шаблонів в Proxmox
-- [ ] Налаштування storage pools
+**Morning (9:00-12:00)**
+- [ ] Create test namespaces
+- [ ] Prepare VM templates in Proxmox
+- [ ] Configure storage pools
 
-**День (13:00-17:00)**
-- [ ] Налаштування API доступу
-  - Створення користувача k8s-api@pve
-  - Надання необхідних дозволів
-  - Тестування API підключення
+**Afternoon (13:00-17:00)**
+- [ ] API Access Setup
+  - Create k8s-api@pve user
+  - Grant necessary permissions
+  - Test API connection
 
-**Вечір (17:00-18:00)**
-- [ ] Запуск Step 1 тестів (API Connection)
-- [ ] Аналіз результатів
+**Evening (17:00-18:00)**
+- [ ] Run Step 1 tests (API Connection)
+- [ ] Analyze results
 
-#### День 3 (Середа, 17.01.2024)
-**Phase 2.1: Proxmox API інтеграція**
+#### Day 3 (Wednesday, 17.09.2025)
+**Phase 2.1: Proxmox API Integration**
 
-**Ранок (9:00-12:00)**
-- [ ] Завершення Step 1 тестів
-- [ ] Виправлення виявлених проблем
-- [ ] Налаштування мережі та сховища
+**Morning (9:00-12:00)**
+- [ ] Complete Step 1 tests
+- [ ] Fix identified issues
+- [ ] Configure network and storage
 
-**День (13:00-17:00)**
-- [ ] Запуск Step 2 тестів (Network & Storage)
-- [ ] Конфігурація network bridges
-- [ ] Налаштування storage pools
+**Afternoon (13:00-17:00)**
+- [ ] Run Step 2 tests (Network & Storage)
+- [ ] Configure network bridges
+- [ ] Setup storage pools
 
-**Вечір (17:00-18:00)**
-- [ ] Аналіз результатів Step 2
-- [ ] Планування Cluster API інтеграції
+**Evening (17:00-18:00)**
+- [ ] Analyze Step 2 results
+- [ ] Plan Cluster API integration
 
-#### День 4 (Четвер, 18.01.2024)
-**Phase 2.2: Cluster API інтеграція**
+#### Day 4 (Thursday, 18.09.2025)
+**Phase 2.2: Cluster API Integration**
 
-**Ранок (9:00-12:00)**
-- [ ] Встановлення CAPI Proxmox провайдера
-- [ ] Перевірка CRD встановлення
-- [ ] Налаштування InfrastructureProvider
+**Morning (9:00-12:00)**
+- [ ] Install CAPI Proxmox provider
+- [ ] Verify CRD installation
+- [ ] Configure InfrastructureProvider
 
-**День (13:00-17:00)**
-- [ ] Запуск Step 3 тестів (VM Management)
-- [ ] Створення ProxmoxCluster ресурсу
-- [ ] Тестування ProxmoxMachine lifecycle
+**Afternoon (13:00-17:00)**
+- [ ] Run Step 3 tests (VM Management)
+- [ ] Create ProxmoxCluster resource
+- [ ] Test ProxmoxMachine lifecycle
 
-**Вечір (17:00-18:00)**
-- [ ] Валідація VM provisioning
-- [ ] Документування результатів
+**Evening (17:00-18:00)**
+- [ ] Validate VM provisioning
+- [ ] Document results
 
-#### День 5 (П'ятниця, 19.01.2024)
-**Phase 3.1: Worker Node інтеграція**
+#### Day 5 (Friday, 19.09.2025)
+**Phase 3.1: Worker Node Integration**
 
-**Ранок (9:00-12:00)**
-- [ ] Деплой proxmox-worker chart
-- [ ] Налаштування kubeadm join процесу
-- [ ] Валідація worker node функціональності
+**Morning (9:00-12:00)**
+- [ ] Deploy proxmox-worker chart
+- [ ] Configure kubeadm join process
+- [ ] Validate worker node functionality
 
-**День (13:00-17:00)**
-- [ ] Запуск Step 4 тестів (Worker Integration)
-- [ ] Перевірка pod scheduling
-- [ ] Тестування resource allocation
+**Afternoon (13:00-17:00)**
+- [ ] Run Step 4 tests (Worker Integration)
+- [ ] Verify pod scheduling
+- [ ] Test resource allocation
 
-**Вечір (17:00-18:00)**
-- [ ] Тижневий огляд прогресу
-- [ ] Планування наступного тижня
+**Evening (17:00-18:00)**
+- [ ] Weekly progress review
+- [ ] Plan next week
 
-### Тиждень 2: Розширена інтеграція та тестування
+### Week 2: Advanced Integration and Testing
 
-#### День 6 (Понеділок, 22.01.2024)
-**Phase 3.2: CSI Storage інтеграція**
+#### Day 6 (Monday, 22.09.2025)
+**Phase 3.2: CSI Storage Integration**
 
-**Ранок (9:00-12:00)**
-- [ ] Встановлення Proxmox CSI driver
-- [ ] Налаштування storage classes
-- [ ] Конфігурація volume provisioning
+**Morning (9:00-12:00)**
+- [ ] Install Proxmox CSI driver
+- [ ] Configure storage classes
+- [ ] Setup volume provisioning
 
-**День (13:00-17:00)**
-- [ ] Запуск Step 5 тестів (CSI Storage)
-- [ ] Тестування dynamic volume provisioning
-- [ ] Валідація volume mounting
+**Afternoon (13:00-17:00)**
+- [ ] Run Step 5 tests (CSI Storage)
+- [ ] Test dynamic volume provisioning
+- [ ] Validate volume mounting
 
-**Вечір (17:00-18:00)**
-- [ ] Тестування snapshot функціональності
-- [ ] Аналіз результатів
+**Evening (17:00-18:00)**
+- [ ] Test snapshot functionality
+- [ ] Analyze results
 
-#### День 7 (Вівторок, 23.01.2024)
-**Phase 4.1: Мережеві політики та безпека**
+#### Day 7 (Tuesday, 23.09.2025)
+**Phase 4.1: Network Policies and Security**
 
-**Ранок (9:00-12:00)**
-- [ ] Налаштування Cilium + Kube-OVN
-- [ ] Конфігурація network policies
-- [ ] Тестування pod-to-pod connectivity
+**Morning (9:00-12:00)**
+- [ ] Configure Cilium + Kube-OVN
+- [ ] Setup network policies
+- [ ] Test pod-to-pod connectivity
 
-**День (13:00-17:00)**
-- [ ] Запуск Step 6 тестів (Network Policies)
-- [ ] Валідація network policy enforcement
-- [ ] Тестування security policies
+**Afternoon (13:00-17:00)**
+- [ ] Run Step 6 tests (Network Policies)
+- [ ] Validate network policy enforcement
+- [ ] Test security policies
 
-**Вечір (17:00-18:00)**
-- [ ] Перевірка CNI інтеграції
-- [ ] Документування мережевої конфігурації
+**Evening (17:00-18:00)**
+- [ ] Check CNI integration
+- [ ] Document network configuration
 
-#### День 8 (Середа, 24.01.2024)
-**Phase 4.2: Моніторинг та логування**
+#### Day 8 (Wednesday, 24.09.2025)
+**Phase 4.2: Monitoring and Logging**
 
-**Ранок (9:00-12:00)**
-- [ ] Налаштування Prometheus/Grafana
-- [ ] Інтеграція з Proxmox метриками
-- [ ] Створення dashboard'ів
+**Morning (9:00-12:00)**
+- [ ] Setup Prometheus/Grafana
+- [ ] Integrate Proxmox metrics
+- [ ] Create dashboards
 
-**День (13:00-17:00)**
-- [ ] Запуск Step 7 тестів (Monitoring)
-- [ ] Валідація metrics collection
-- [ ] Тестування alerting rules
+**Afternoon (13:00-17:00)**
+- [ ] Run Step 7 tests (Monitoring)
+- [ ] Validate metrics collection
+- [ ] Test alerting rules
 
-**Вечір (17:00-18:00)**
-- [ ] Налаштування log aggregation
-- [ ] Аналіз моніторингу
+**Evening (17:00-18:00)**
+- [ ] Setup log aggregation
+- [ ] Analyze monitoring
 
-#### День 9 (Четвер, 25.01.2024)
-**Phase 4.3: End-to-End тестування**
+#### Day 9 (Thursday, 25.09.2025)
+**Phase 4.3: End-to-End Testing**
 
-**Ранок (9:00-12:00)**
-- [ ] Підготовка E2E тестових сценаріїв
-- [ ] Налаштування performance тестів
-- [ ] Підготовка reliability тестів
+**Morning (9:00-12:00)**
+- [ ] Prepare E2E test scenarios
+- [ ] Setup performance tests
+- [ ] Prepare reliability tests
 
-**День (13:00-17:00)**
-- [ ] Запуск Step 8 тестів (E2E Integration)
-- [ ] Тестування повного workflow
+**Afternoon (13:00-17:00)**
+- [ ] Run Step 8 tests (E2E Integration)
+- [ ] Test complete workflow
 - [ ] Performance benchmarking
 
-**Вечір (17:00-18:00)**
-- [ ] Reliability тестування
-- [ ] Аналіз E2E результатів
+**Evening (17:00-18:00)**
+- [ ] Reliability testing
+- [ ] Analyze E2E results
 
-#### День 10 (П'ятниця, 26.01.2024)
-**Phase 5: Документація та оптимізація**
+#### Day 10 (Friday, 26.09.2025)
+**Phase 5: Documentation and Optimization**
 
-**Ранок (9:00-12:00)**
-- [ ] Створення Runbook встановлення
-- [ ] Оновлення troubleshooting guide
-- [ ] Створення performance tuning guide
+**Morning (9:00-12:00)**
+- [ ] Create Installation Runbook
+- [ ] Update troubleshooting guide
+- [ ] Create performance tuning guide
 
-**День (13:00-17:00)**
-- [ ] Оптимізація конфігурації
+**Afternoon (13:00-17:00)**
+- [ ] Optimize configuration
 - [ ] Security audit
 - [ ] Performance tuning
 
-**Вечір (17:00-18:00)**
-- [ ] Тижневий огляд прогресу
-- [ ] Планування фінального етапу
+**Evening (17:00-18:00)**
+- [ ] Weekly progress review
+- [ ] Plan final phase
 
-### Фінальний етап
+### Final Phase
 
-#### День 11 (Понеділок, 27.01.2024)
-**Phase 6: Фінальне тестування**
+#### Day 11 (Monday, 27.09.2025)
+**Phase 6: Final Testing**
 
-**Ранок (9:00-12:00)**
-- [ ] Повторне тестування всіх компонентів
-- [ ] Валідація всіх 8 тестових кроків
-- [ ] Перевірка performance метрик
+**Morning (9:00-12:00)**
+- [ ] Re-test all components
+- [ ] Validate all 8 test steps
+- [ ] Check performance metrics
 
-**День (13:00-17:00)**
+**Afternoon (13:00-17:00)**
 - [ ] Security audit
-- [ ] Backup/restore тестування
-- [ ] Upgrade procedures тестування
+- [ ] Backup/restore testing
+- [ ] Upgrade procedures testing
 
-**Вечір (17:00-18:00)**
-- [ ] Аналіз фінальних результатів
-- [ ] Підготовка звітів
+**Evening (17:00-18:00)**
+- [ ] Analyze final results
+- [ ] Prepare reports
 
-#### День 12 (Вівторок, 28.01.2024)
-**Phase 7: Документація та звітність**
+#### Day 12 (Tuesday, 28.09.2025)
+**Phase 7: Documentation and Reporting**
 
-**Ранок (9:00-12:00)**
-- [ ] Фіналізація Runbook
-- [ ] Створення troubleshooting guide
-- [ ] Оновлення документації
+**Morning (9:00-12:00)**
+- [ ] Finalize Runbook
+- [ ] Create troubleshooting guide
+- [ ] Update documentation
 
-**День (13:00-17:00)**
-- [ ] Створення звітів
-- [ ] Підготовка presentation
-- [ ] Фінальна перевірка
+**Afternoon (13:00-17:00)**
+- [ ] Create reports
+- [ ] Prepare presentation
+- [ ] Final verification
 
-**Вечір (17:00-18:00)**
-- [ ] Підготовка до демонстрації
-- [ ] Фінальний огляд
+**Evening (17:00-18:00)**
+- [ ] Prepare for demonstration
+- [ ] Final review
 
-#### День 13 (Середа, 29.01.2024)
-**Phase 8: Демонстрація та передача**
+#### Day 13 (Wednesday, 29.09.2025)
+**Phase 8: Demonstration and Handover**
 
-**Ранок (9:00-12:00)**
-- [ ] Демонстрація функціональності
-- [ ] Presentation для команди
-- [ ] Q&A сесія
+**Morning (9:00-12:00)**
+- [ ] Functionality demonstration
+- [ ] Team presentation
+- [ ] Q&A session
 
-**День (13:00-17:00)**
-- [ ] Передача знань команді
+**Afternoon (13:00-17:00)**
+- [ ] Knowledge transfer to team
 - [ ] Training session
-- [ ] Документація процедур
+- [ ] Procedure documentation
 
-**Вечір (17:00-18:00)**
-- [ ] Фінальний огляд спринту
-- [ ] Планування наступних кроків
+**Evening (17:00-18:00)**
+- [ ] Final sprint review
+- [ ] Plan next steps
 
-## 📊 Ключові мілістоні
+## 📊 Key Milestones
 
-### Тиждень 1 Мілістоні
-- **День 2**: API підключення працює ✅
-- **День 3**: Мережа та сховище налаштовані ✅
-- **День 4**: Cluster API провайдер працює ✅
-- **День 5**: Worker node приєднався ✅
+### Week 1 Milestones
+- **Day 2**: API connection works ✅
+- **Day 3**: Network and storage configured ✅
+- **Day 4**: Cluster API provider works ✅
+- **Day 5**: Worker node joined ✅
 
-### Тиждень 2 Мілістоні
-- **День 6**: CSI storage працює ✅
-- **День 7**: Мережеві політики застосовуються ✅
-- **День 8**: Моніторинг збирає метрики ✅
-- **День 9**: E2E тестування пройшло ✅
+### Week 2 Milestones
+- **Day 6**: CSI storage works ✅
+- **Day 7**: Network policies applied ✅
+- **Day 8**: Monitoring collects metrics ✅
+- **Day 9**: E2E testing passed ✅
 
-### Фінальні Мілістоні
-- **День 11**: Всі тести пройшли ✅
-- **День 12**: Документація готова ✅
-- **День 13**: Демонстрація завершена ✅
+### Final Milestones
+- **Day 11**: All tests passed ✅
+- **Day 12**: Documentation ready ✅
+- **Day 13**: Demonstration completed ✅
 
-## 🎯 Критерії успіху по днях
+## 🎯 Success Criteria by Days
 
-### День 1-2: Підготовка
-- [ ] Proxmox та Kubernetes оцінені
-- [ ] Тестове середовище підготовлене
-- [ ] API підключення працює
+### Day 1-2: Preparation
+- [ ] Proxmox and Kubernetes assessed
+- [ ] Test environment prepared
+- [ ] API connection works
 
-### День 3-4: Базова інтеграція
-- [ ] Мережа та сховище налаштовані
-- [ ] Cluster API провайдер встановлений
-- [ ] VM створюються через CAPI
+### Day 3-4: Basic Integration
+- [ ] Network and storage configured
+- [ ] Cluster API provider installed
+- [ ] VMs created via CAPI
 
-### День 5-6: Worker та Storage
-- [ ] Proxmox працює як worker node
-- [ ] CSI storage provisioning працює
-- [ ] Pods можуть використовувати storage
+### Day 5-6: Worker and Storage
+- [ ] Proxmox works as worker node
+- [ ] CSI storage provisioning works
+- [ ] Pods can use storage
 
-### День 7-8: Мережа та моніторинг
-- [ ] Мережеві політики застосовуються
-- [ ] Моніторинг збирає метрики
-- [ ] Logging працює
+### Day 7-8: Network and Monitoring
+- [ ] Network policies applied
+- [ ] Monitoring collects metrics
+- [ ] Logging works
 
-### День 9-10: E2E та оптимізація
-- [ ] E2E тестування пройшло
-- [ ] Performance відповідає вимогам
-- [ ] Документація створена
+### Day 9-10: E2E and Optimization
+- [ ] E2E testing passed
+- [ ] Performance meets requirements
+- [ ] Documentation created
 
-### День 11-13: Фіналізація
-- [ ] Всі тести пройшли успішно
-- [ ] Документація готова
-- [ ] Команда навчена
+### Day 11-13: Finalization
+- [ ] All tests passed successfully
+- [ ] Documentation ready
+- [ ] Team trained
 
-## 🚨 Ризики та мітигація
+## 🚨 Risks and Mitigation
 
-### Технічні ризики
-1. **API підключення не працює**
-   - *Вплив*: Блокує весь спринт
-   - *Мітигація*: Резервний план з іншими credentials
+### Technical Risks
+1. **API Connection Not Working**
+   - *Impact*: Blocks entire sprint
+   - *Mitigation*: Backup plan with other credentials
 
-2. **CAPI провайдер не встановлюється**
-   - *Вплив*: Блокує VM управління
-   - *Мітигація*: Альтернативні методи встановлення
+2. **CAPI Provider Not Installing**
+   - *Impact*: Blocks VM management
+   - *Mitigation*: Alternative installation methods
 
-3. **Storage не працює**
-   - *Вплив*: Блокує persistent storage
-   - *Мітигація*: Використання local storage
+3. **Storage Not Working**
+   - *Impact*: Blocks persistent storage
+   - *Mitigation*: Use local storage
 
-### Процесні ризики
-1. **Тести займають більше часу**
-   - *Вплив*: Затримка спринту
-   - *Мітигація*: Паралельне виконання
+### Process Risks
+1. **Tests Take More Time**
+   - *Impact*: Sprint delay
+   - *Mitigation*: Parallel execution
 
-2. **Проблеми важко діагностувати**
-   - *Вплив*: Затримка налагодження
-   - *Мітигація*: Детальне логування
+2. **Problems Hard to Diagnose**
+   - *Impact*: Debugging delays
+   - *Mitigation*: Detailed logging
 
-## 📞 Комунікація
+## 📞 Communication
 
-### Щоденні синхронізації
-- **9:00 AM**: Ранкова синхронізація (15 хв)
-- **5:00 PM**: Вечірня ретроспектива (15 хв)
+### Daily Synchronizations
+- **9:00 AM**: Morning sync (15 min)
+- **5:00 PM**: Evening retrospective (15 min)
 
-### Тижневі огляди
-- **П'ятниця 4:00 PM**: Тижневий огляд прогресу
-- **Понеділок 9:00 AM**: Планування тижня
+### Weekly Reviews
+- **Friday 4:00 PM**: Weekly progress review
+- **Monday 9:00 AM**: Week planning
 
-### Екстрені ситуації
+### Emergency Situations
 - **Slack**: #proxmox-integration
 - **Phone**: @oncall
 - **Escalation**: Tech Lead
 
-## 📈 Метрики прогресу
+## 📈 Progress Metrics
 
-### Щоденні метрики
-- Кількість завершених завдань
-- Відсоток успішних тестів
-- Кількість виявлених проблем
-- Час виконання завдань
+### Daily Metrics
+- Number of completed tasks
+- Percentage of successful tests
+- Number of identified problems
+- Task execution time
 
-### Тижневі метрики
-- Загальний прогрес по фазах
-- Кількість інтегрованих компонентів
-- Рівень готовності до production
+### Weekly Metrics
+- Overall progress by phases
+- Number of integrated components
+- Production readiness level
 
-### Фінальні метрики
-- Відсоток успішних тестів: > 95%
-- Performance відповідає вимогам: 100%
-- Документація готова: 100%
-- Команда навчена: 100%
+### Final Metrics
+- Test success rate: > 95%
+- Performance meets requirements: 100%
+- Documentation ready: 100%
+- Team trained: 100%
 
 ---
 
-**Останнє оновлення**: 2024-01-15  
-**Версія**: 1.0.0  
-**Автор**: CozyStack Team
+**Last Updated**: 2025-09-10  
+**Version**: 1.0.0  
+**Author**: CozyStack Team

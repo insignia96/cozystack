@@ -1,74 +1,74 @@
 # Proxmox Integration Runbook
 
-## 📋 Огляд
+## 📋 Overview
 
-Цей runbook містить покрокові інструкції для встановлення, налаштування та підтримки інтеграції Proxmox VE з CozyStack платформою.
+This runbook contains step-by-step instructions for installing, configuring, and maintaining Proxmox VE integration with CozyStack platform.
 
-## 🎯 Передумови
+## 🎯 Prerequisites
 
-### Системні вимоги
+### System Requirements
 
 #### Proxmox VE Server
-- **Версія**: 7.0+ (рекомендовано 8.0+)
+- **Version**: 7.0+ (recommended 8.0+)
 - **CPU**: 4+ cores (VT-x/AMD-V enabled)
-- **RAM**: 8GB+ (рекомендовано 16GB+)
-- **Storage**: 100GB+ для VM templates та storage pools
-- **Network**: Статичний IP, доступ до Kubernetes кластера
+- **RAM**: 8GB+ (recommended 16GB+)
+- **Storage**: 100GB+ for VM templates and storage pools
+- **Network**: Static IP, access to Kubernetes cluster
 
 #### Kubernetes Cluster (CozyStack)
-- **Версія**: 1.26+ (рекомендовано 1.28+)
+- **Version**: 1.26+ (recommended 1.28+)
 - **Nodes**: 3+ nodes (1 master + 2+ workers)
 - **RAM**: 4GB+ per node
-- **Storage**: 50GB+ для etcd та logs
-- **Network**: Підключення до Proxmox сервера
+- **Storage**: 50GB+ for etcd and logs
+- **Network**: Connection to Proxmox server
 
-#### Додаткові вимоги
-- **kubectl**: 1.26+ версія
-- **helm**: 3.8+ версія
-- **python3**: 3.8+ версія
-- **pytest**: для тестування
-- **curl**: для API тестування
+#### Additional Requirements
+- **kubectl**: 1.26+ version
+- **helm**: 3.8+ version
+- **python3**: 3.8+ version
+- **pytest**: for testing
+- **curl**: for API testing
 
-### Мережеві вимоги
+### Network Requirements
 
-#### Порти Proxmox VE
-- **8006**: Web UI та API (HTTPS)
-- **22**: SSH доступ
-- **5900-5999**: VNC консоль (опціонально)
-- **3128**: Proxmox backup server (опціонально)
+#### Proxmox VE Ports
+- **8006**: Web UI and API (HTTPS)
+- **22**: SSH access
+- **5900-5999**: VNC console (optional)
+- **3128**: Proxmox backup server (optional)
 
-#### Порти Kubernetes
+#### Kubernetes Ports
 - **6443**: Kubernetes API server
 - **2379-2380**: etcd server
 - **10250**: kubelet API
 - **10251**: kube-scheduler
 - **10252**: kube-controller-manager
 
-## 🚀 Встановлення
+## 🚀 Installation
 
-### Крок 1: Підготовка Proxmox сервера
+### Step 1: Proxmox Server Preparation
 
-#### 1.1 Перевірка системи
+#### 1.1 System Check
 ```bash
-# Перевірка версії Proxmox
+# Check Proxmox version
 pveversion -v
 
-# Перевірка ресурсів
+# Check resources
 free -h
 df -h
 lscpu
 
-# Перевірка мережі
+# Check network
 ip addr show
 ip route show
 ```
 
-#### 1.2 Налаштування мережі
+#### 1.2 Network Configuration
 ```bash
-# Редагування мережевої конфігурації
+# Edit network configuration
 nano /etc/network/interfaces
 
-# Приклад конфігурації:
+# Example configuration:
 # auto vmbr0
 # iface vmbr0 inet static
 #     address 192.168.1.100/24
@@ -77,85 +77,85 @@ nano /etc/network/interfaces
 #     bridge_stp off
 #     bridge_fd 0
 
-# Перезапуск мережі
+# Restart network
 systemctl restart networking
 ```
 
-#### 1.3 Налаштування storage pools
+#### 1.3 Storage Pools Setup
 ```bash
-# Перевірка наявних storage
+# Check available storage
 pvesm status
 
-# Створення storage pool для Kubernetes
+# Create storage pool for Kubernetes
 pvesm add lvm-thin proxmox-k8s --vgname pve --thinpool k8s-thin
 
-# Або використання існуючого storage
+# Or use existing storage
 pvesm add dir proxmox-k8s --path /var/lib/vz/k8s
 ```
 
-#### 1.4 Налаштування API доступу
+#### 1.4 API Access Setup
 ```bash
-# Створення користувача для API
+# Create user for API
 pveum user add k8s-api@pve --password 'secure-password'
 
-# Надання дозволів
+# Grant permissions
 pveum role add Kubernetes --privs "VM.Allocate VM.Clone VM.Config.CDROM VM.Config.CPU VM.Config.Disk VM.Config.Hardware VM.Config.Memory VM.Config.Network VM.Config.Options VM.Monitor VM.PowerMgmt Datastore.AllocateSpace Datastore.Audit Pool.Allocate Sys.Audit Sys.Console Sys.Modify"
 
-# Призначення ролі користувачу
+# Assign role to user
 pveum aclmod / --users k8s-api@pve --roles Kubernetes
 ```
 
-### Крок 2: Підготовка Kubernetes кластера
+### Step 2: Kubernetes Cluster Preparation
 
-#### 2.1 Перевірка CozyStack компонентів
+#### 2.1 Check CozyStack Components
 ```bash
-# Перевірка namespace'ів
+# Check namespaces
 kubectl get namespaces | grep cozy
 
-# Перевірка Cluster API оператора
+# Check Cluster API operator
 kubectl get pods -n cozy-cluster-api
 
-# Перевірка CAPI провайдерів
+# Check CAPI providers
 kubectl get infrastructureproviders -A
 ```
 
-#### 2.2 Встановлення необхідних компонентів
+#### 2.2 Install Required Components
 ```bash
-# Перевірка наявності Helm charts
+# Check available Helm charts
 helm list -A | grep -E "(capi|proxmox)"
 
-# Якщо потрібно встановити CAPI оператор
+# If needed, install CAPI operator
 helm install capi-operator cozy-capi-operator -n cozy-cluster-api
 
-# Встановлення CAPI провайдерів
+# Install CAPI providers
 helm install capi-providers cozy-capi-providers -n cozy-cluster-api
 ```
 
-### Крок 3: Налаштування інтеграції
+### Step 3: Integration Configuration
 
-#### 3.1 Копіювання тестових скриптів
+#### 3.1 Copy Test Scripts
 ```bash
-# Створення робочої директорії
+# Create working directory
 mkdir -p /opt/proxmox-integration
 cd /opt/proxmox-integration
 
-# Копіювання з CozyStack репозиторію
+# Copy from CozyStack repository
 cp -r /path/to/cozystack/tests/proxmox-integration/* .
 
-# Надання прав на виконання
+# Make executable
 chmod +x *.sh
 ```
 
-#### 3.2 Налаштування конфігурації
+#### 3.2 Configuration Setup
 ```bash
-# Копіювання прикладу конфігурації
+# Copy example configuration
 cp config.example.env config.env
 
-# Редагування конфігурації
+# Edit configuration
 nano config.env
 ```
 
-**Приклад config.env:**
+**Example config.env:**
 ```bash
 # Proxmox Configuration
 PROXMOX_HOST="192.168.1.100"
@@ -192,96 +192,96 @@ E2E_ENABLE_NETWORK="true"
 E2E_CLEANUP_ON_FAILURE="true"
 ```
 
-#### 3.3 Встановлення залежностей
+#### 3.3 Install Dependencies
 ```bash
-# Встановлення Python залежностей
+# Install Python dependencies
 pip3 install -r requirements.txt
 
-# Встановлення додаткових інструментів
+# Install additional tools
 apt-get update
 apt-get install -y curl jq openssl
 ```
 
-### Крок 4: Запуск тестів інтеграції
+### Step 4: Run Integration Tests
 
-#### 4.1 Підготовка тестового середовища
+#### 4.1 Prepare Test Environment
 ```bash
-# Запуск setup скрипта
+# Run setup script
 ./setup-test-env.sh
 
-# Перевірка підготовки
+# Check preparation
 kubectl get namespaces | grep proxmox-test
 ```
 
-#### 4.2 Послідовне тестування
+#### 4.2 Sequential Testing
 ```bash
-# Крок 1: API підключення
+# Step 1: API connection
 ./run-all-tests.sh -s 1
 
-# Крок 2: Мережа та сховище
+# Step 2: Network and storage
 ./run-all-tests.sh -s 2
 
-# Крок 3: VM управління
+# Step 3: VM management
 ./run-all-tests.sh -s 3
 
-# Крок 4: Worker інтеграція
+# Step 4: Worker integration
 ./run-all-tests.sh -s 4
 
-# Крок 5: CSI storage
+# Step 5: CSI storage
 ./run-all-tests.sh -s 5
 
-# Крок 6: Мережеві політики
+# Step 6: Network policies
 ./run-all-tests.sh -s 6
 
-# Крок 7: Моніторинг
+# Step 7: Monitoring
 ./run-all-tests.sh -s 7
 
-# Крок 8: E2E тестування
+# Step 8: E2E testing
 ./run-all-tests.sh -s 8
 ```
 
-#### 4.3 Повне тестування
+#### 4.3 Full Testing
 ```bash
-# Запуск всіх тестів
+# Run all tests
 ./run-all-tests.sh
 
-# Запуск з детальним логуванням
+# Run with detailed logging
 ./run-all-tests.sh -v
 
-# Запуск з збереженням ресурсів для налагодження
+# Run with resource preservation for debugging
 KEEP_TEST_RESOURCES=true ./run-all-tests.sh
 ```
 
-## 🔧 Налаштування компонентів
+## 🔧 Component Configuration
 
 ### Cluster API Proxmox Provider
 
-#### Встановлення
+#### Installation
 ```bash
-# Деплой CAPI Proxmox провайдера
+# Deploy CAPI Proxmox provider
 helm install capi-providers-proxmox cozy-capi-providers-proxmox \
   -n cozy-cluster-api \
   --set proxmox.enabled=true \
   --set kubevirt.enabled=false
 ```
 
-#### Перевірка встановлення
+#### Verify Installation
 ```bash
-# Перевірка CRD
+# Check CRDs
 kubectl get crd | grep proxmox
 
-# Перевірка InfrastructureProvider
+# Check InfrastructureProvider
 kubectl get infrastructureproviders
 
-# Перевірка подів
+# Check pods
 kubectl get pods -n cozy-cluster-api | grep proxmox
 ```
 
 ### Proxmox Worker Node
 
-#### Встановлення
+#### Installation
 ```bash
-# Деплой Proxmox worker chart
+# Deploy Proxmox worker chart
 helm install proxmox-worker proxmox-worker \
   -n cozy-proxmox \
   --set proxmox.host="192.168.1.100" \
@@ -289,23 +289,23 @@ helm install proxmox-worker proxmox-worker \
   --set proxmox.password="secure-password"
 ```
 
-#### Перевірка worker node
+#### Verify Worker Node
 ```bash
-# Перевірка node статусу
+# Check node status
 kubectl get nodes -o wide
 
-# Перевірка labels та taints
+# Check labels and taints
 kubectl describe node proxmox-worker
 
-# Перевірка pod scheduling
+# Check pod scheduling
 kubectl get pods -o wide | grep proxmox-worker
 ```
 
 ### CSI Storage Driver
 
-#### Встановлення
+#### Installation
 ```bash
-# Деплой Proxmox CSI оператора
+# Deploy Proxmox CSI operator
 helm install proxmox-csi-operator cozy-proxmox-csi-operator \
   -n cozy-proxmox \
   --set proxmox.host="192.168.1.100" \
@@ -313,7 +313,7 @@ helm install proxmox-csi-operator cozy-proxmox-csi-operator \
   --set proxmox.password="secure-password"
 ```
 
-#### Налаштування Storage Class
+#### Configure Storage Class
 ```yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -327,15 +327,15 @@ reclaimPolicy: Delete
 allowVolumeExpansion: true
 ```
 
-#### Перевірка CSI
+#### Verify CSI
 ```bash
-# Перевірка CSI driver
+# Check CSI driver
 kubectl get csidriver
 
-# Перевірка storage class
+# Check storage class
 kubectl get storageclass
 
-# Тестування volume provisioning
+# Test volume provisioning
 kubectl apply -f - <<EOF
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -351,157 +351,157 @@ spec:
 EOF
 ```
 
-## 🔍 Моніторинг та діагностика
+## 🔍 Monitoring and Diagnostics
 
-### Перевірка статусу компонентів
+### Check Component Status
 
-#### Proxmox сервер
+#### Proxmox Server
 ```bash
-# Статус сервісів
+# Service status
 systemctl status pve-cluster
 systemctl status pveproxy
 systemctl status pvedaemon
 
-# Логи
+# Logs
 journalctl -u pve-cluster -f
 journalctl -u pveproxy -f
 ```
 
-#### Kubernetes кластер
+#### Kubernetes Cluster
 ```bash
-# Статус подів
+# Pod status
 kubectl get pods -A | grep -E "(proxmox|capi)"
 
-# Логи CAPI провайдера
+# CAPI provider logs
 kubectl logs -n cozy-cluster-api -l app.kubernetes.io/name=capi-providers-proxmox
 
-# Логи CSI driver
+# CSI driver logs
 kubectl logs -n cozy-proxmox -l app.kubernetes.io/name=proxmox-csi-operator
 ```
 
-### Метрики та моніторинг
+### Metrics and Monitoring
 
-#### Prometheus метрики
+#### Prometheus Metrics
 ```bash
-# Перевірка метрик Proxmox
+# Check Proxmox metrics
 curl -k https://192.168.1.100:8006/api2/json/version
 
-# Перевірка метрик Kubernetes
+# Check Kubernetes metrics
 kubectl get --raw /metrics
 
-# Перевірка метрик CAPI
+# Check CAPI metrics
 kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes
 ```
 
-#### Grafana dashboard
+#### Grafana Dashboard
 ```bash
-# Доступ до Grafana
+# Access Grafana
 kubectl port-forward -n cozy-monitoring svc/grafana 3000:80
 
-# Відкрити в браузері
+# Open in browser
 # http://localhost:3000
 ```
 
 ## 🚨 Troubleshooting
 
-### Загальні проблеми
+### Common Issues
 
-#### 1. API підключення не працює
+#### 1. API Connection Not Working
 ```bash
-# Перевірка мережевої підключенності
+# Check network connectivity
 ping 192.168.1.100
 telnet 192.168.1.100 8006
 
-# Перевірка SSL сертифікатів
+# Check SSL certificates
 openssl s_client -connect 192.168.1.100:8006 -servername 192.168.1.100
 
-# Тестування API
+# Test API
 curl -k -u k8s-api@pve:secure-password https://192.168.1.100:8006/api2/json/version
 ```
 
-#### 2. CAPI провайдер не встановлюється
+#### 2. CAPI Provider Not Installing
 ```bash
-# Перевірка CRD
+# Check CRDs
 kubectl get crd | grep cluster
 
-# Перевірка подів
+# Check pods
 kubectl get pods -n cozy-cluster-api
 
-# Логи
+# Logs
 kubectl logs -n cozy-cluster-api -l app.kubernetes.io/name=capi-operator
 ```
 
-#### 3. Worker node не приєднується
+#### 3. Worker Node Not Joining
 ```bash
-# Перевірка kubeadm конфігурації
+# Check kubeadm configuration
 kubectl get nodes
 kubectl describe node proxmox-worker
 
-# Перевірка join token
+# Check join token
 kubeadm token list
 
-# Логи kubelet
+# Kubelet logs
 journalctl -u kubelet -f
 ```
 
-#### 4. CSI storage не працює
+#### 4. CSI Storage Not Working
 ```bash
-# Перевірка CSI driver
+# Check CSI driver
 kubectl get csidriver
 kubectl get pods -n cozy-proxmox
 
-# Перевірка storage class
+# Check storage class
 kubectl get storageclass
 kubectl describe storageclass proxmox-csi
 
-# Логи CSI driver
+# CSI driver logs
 kubectl logs -n cozy-proxmox -l app.kubernetes.io/name=proxmox-csi-operator
 ```
 
-### Діагностичні команди
+### Diagnostic Commands
 
-#### Перевірка Proxmox
+#### Check Proxmox
 ```bash
-# Статус системи
+# System status
 pveversion -v
 pveceph status
 pvesm status
 
-# Статус VM
+# VM status
 qm list
 qm status <vmid>
 
-# Мережева конфігурація
+# Network configuration
 cat /etc/network/interfaces
 ip addr show
 ```
 
-#### Перевірка Kubernetes
+#### Check Kubernetes
 ```bash
-# Статус кластера
+# Cluster status
 kubectl cluster-info
 kubectl get nodes -o wide
 kubectl get pods -A
 
-# Статус CAPI
+# CAPI status
 kubectl get clusters,machines,proxmoxclusters,proxmoxmachines -A
 
-# Статус storage
+# Storage status
 kubectl get pv,pvc,storageclass
 kubectl get csidriver
 ```
 
-## 🔄 Обслуговування
+## 🔄 Maintenance
 
-### Регулярні завдання
+### Regular Tasks
 
-#### Щоденні перевірки
+#### Daily Checks
 ```bash
-# Скрипт щоденної перевірки
+# Daily health check script
 #!/bin/bash
 echo "=== Proxmox Integration Health Check ==="
 
-# Перевірка Proxmox API
+# Check Proxmox API
 curl -k -s -u k8s-api@pve:secure-password https://192.168.1.100:8006/api2/json/version > /dev/null
 if [ $? -eq 0 ]; then
     echo "✅ Proxmox API: OK"
@@ -509,7 +509,7 @@ else
     echo "❌ Proxmox API: FAILED"
 fi
 
-# Перевірка Kubernetes API
+# Check Kubernetes API
 kubectl cluster-info > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     echo "✅ Kubernetes API: OK"
@@ -517,7 +517,7 @@ else
     echo "❌ Kubernetes API: FAILED"
 fi
 
-# Перевірка CAPI провайдера
+# Check CAPI provider
 kubectl get infrastructureproviders > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     echo "✅ CAPI Provider: OK"
@@ -525,7 +525,7 @@ else
     echo "❌ CAPI Provider: FAILED"
 fi
 
-# Перевірка worker nodes
+# Check worker nodes
 kubectl get nodes | grep proxmox-worker > /dev/null
 if [ $? -eq 0 ]; then
     echo "✅ Proxmox Worker: OK"
@@ -533,7 +533,7 @@ else
     echo "❌ Proxmox Worker: FAILED"
 fi
 
-# Перевірка CSI driver
+# Check CSI driver
 kubectl get csidriver | grep proxmox > /dev/null
 if [ $? -eq 0 ]; then
     echo "✅ CSI Driver: OK"
@@ -544,64 +544,64 @@ fi
 echo "=== Health Check Complete ==="
 ```
 
-#### Тижневі завдання
-- Очищення старих логів
-- Перевірка дискового простору
-- Оновлення backup'ів конфігурації
-- Аналіз метрик та performance
+#### Weekly Tasks
+- Clean old logs
+- Check disk space
+- Update configuration backups
+- Analyze metrics and performance
 
-#### Місячні завдання
-- Оновлення компонентів
+#### Monthly Tasks
+- Update components
 - Security audit
 - Performance tuning
-- Документація змін
+- Documentation updates
 
-### Backup та відновлення
+### Backup and Recovery
 
-#### Backup конфігурації
+#### Configuration Backup
 ```bash
-# Backup Proxmox конфігурації
+# Backup Proxmox configuration
 tar -czf proxmox-config-$(date +%Y%m%d).tar.gz /etc/pve/
 
-# Backup Kubernetes конфігурації
+# Backup Kubernetes configuration
 kubectl get all -A -o yaml > k8s-config-$(date +%Y%m%d).yaml
 
 # Backup Helm releases
 helm list -A -o yaml > helm-releases-$(date +%Y%m%d).yaml
 ```
 
-#### Відновлення
+#### Recovery
 ```bash
-# Відновлення Proxmox конфігурації
+# Restore Proxmox configuration
 tar -xzf proxmox-config-YYYYMMDD.tar.gz -C /
 
-# Відновлення Kubernetes ресурсів
+# Restore Kubernetes resources
 kubectl apply -f k8s-config-YYYYMMDD.yaml
 
-# Відновлення Helm releases
+# Restore Helm releases
 helm install -f helm-releases-YYYYMMDD.yaml
 ```
 
-## 📚 Додаткові ресурси
+## 📚 Additional Resources
 
-### Документація
+### Documentation
 - [Proxmox VE Documentation](https://pve.proxmox.com/wiki/Main_Page)
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
 - [Cluster API Documentation](https://cluster-api.sigs.k8s.io/)
 - [CozyStack Documentation](https://github.com/cozystack/cozystack)
 
-### Корисні посилання
+### Useful Links
 - [Proxmox API Reference](https://pve.proxmox.com/wiki/Proxmox_VE_API)
 - [Kubernetes API Reference](https://kubernetes.io/docs/reference/)
 - [Cluster API Providers](https://cluster-api.sigs.k8s.io/reference/providers.html)
 
-### Підтримка
+### Support
 - **GitHub Issues**: [CozyStack Repository](https://github.com/cozystack/cozystack/issues)
 - **Slack**: #proxmox-integration
 - **Email**: support@cozystack.io
 
 ---
 
-**Останнє оновлення**: 2024-01-15  
-**Версія**: 1.0.0  
-**Автор**: CozyStack Team
+**Last Updated**: 2025-09-10  
+**Version**: 1.0.0  
+**Author**: CozyStack Team

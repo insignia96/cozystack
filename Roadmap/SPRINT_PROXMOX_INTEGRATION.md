@@ -4,9 +4,11 @@
 
 **Sprint Goal**: Complete integration of Proxmox VE with CozyStack platform to create hybrid infrastructure with the ability to manage virtual machines through Kubernetes API.
 
+**Priority Context**: This sprint is scheduled to begin after completion of the priority proxmox-lxcri project. The current focus is on proxmox-lxcri development, with this integration planned as the next major initiative.
+
 **Duration**: 2 weeks (14 days)  
-**Start Date**: 2024-01-15  
-**End Date**: 2024-01-29  
+**Start Date**: 2025-09-15 (after proxmox-lxcri completion)  
+**End Date**: 2025-09-29  
 
 ## 📋 Sprint Tasks
 
@@ -36,195 +38,201 @@
   - Prepare test VM templates in Proxmox
   - Configure test storage pools
 
-### Phase 2: Базова інтеграція (Дні 4-7)
+### Phase 2: Basic Integration (Days 4-7)
 
-#### Task 2.1: Proxmox API інтеграція
-- [ ] **Тестування API підключення**
-  - Запуск `step1-api-connection/test_proxmox_api.py`
-  - Перевірка аутентифікації (username/password + tokens)
-  - Валідація дозволів та response time
-  - Налаштування SSL сертифікатів
+#### Task 2.1: Proxmox API Integration
+- [ ] **API Connection Testing**
+  - Run `step1-api-connection/test_proxmox_api.py`
+  - Verify authentication (username/password + tokens)
+  - Validate permissions and response time
+  - Configure SSL certificates
 
-- [ ] **Налаштування мережі та сховища**
-  - Запуск `step2-network-storage/test_proxmox_network_storage.py`
-  - Конфігурація network bridges (vmbr0+)
-  - Налаштування storage pools для Kubernetes
-  - Валідація ресурсів
+- [ ] **Network and Storage Setup**
+  - Run `step2-network-storage/test_proxmox_network_storage.py`
+  - Configure network bridges (vmbr0+)
+  - Setup storage pools for Kubernetes
+  - Validate resources
 
-#### Task 2.2: Cluster API інтеграція
-- [ ] **Встановлення CAPI Proxmox провайдера**
-  - Деплой `cozy-capi-providers-proxmox` chart
-  - Перевірка CRD встановлення
-  - Налаштування InfrastructureProvider
+#### Task 2.2: Cluster API Integration
+- [ ] **CAPI Proxmox Provider Installation**
+  - Deploy `cozy-capi-providers-proxmox` chart
+  - Verify CRD installation
+  - Configure InfrastructureProvider
 
-- [ ] **Тестування VM управління**
-  - Запуск `step3-vm-management/test_cluster_api_proxmox.py`
-  - Створення ProxmoxCluster ресурсу
-  - Тестування ProxmoxMachine lifecycle
-  - Валідація VM provisioning
+- [ ] **VM Management Testing**
+  - Run `step3-vm-management/test_cluster_api_proxmox.py`
+  - Create ProxmoxCluster resource
+  - Test ProxmoxMachine lifecycle
+  - Validate VM provisioning
 
-### Phase 3: Розширена інтеграція (Дні 8-11)
+### Phase 3: Advanced Integration (Days 8-11)
 
-#### Task 3.1: Worker Node інтеграція
-- [ ] **Додавання Proxmox як worker node**
-  - Деплой `proxmox-worker` chart
-  - Налаштування kubeadm join процесу
-  - Валідація worker node функціональності
+#### Task 3.1: Worker Node Integration
+- [ ] **Adding Proxmox as Worker Node**
+  - Deploy `proxmox-worker` chart
+  - Configure kubeadm join process
+  - Validate worker node functionality
 
-- [ ] **Тестування worker інтеграції**
-  - Запуск `step4-worker-integration/test_proxmox_worker.py`
-  - Перевірка pod scheduling
-  - Тестування resource allocation
-  - Валідація node labels та taints
+- [ ] **Worker Integration Testing**
+  - Run `step4-worker-integration/test_proxmox_worker.py`
+  - Verify pod scheduling
+  - Test resource allocation
+  - Validate node labels and taints
 
-#### Task 3.2: CSI Storage інтеграція
-- [ ] **Встановлення Proxmox CSI driver**
-  - Деплой `cozy-proxmox-csi-operator` chart
-  - Налаштування storage classes
-  - Конфігурація volume provisioning
+#### Task 3.2: CSI Storage Integration
+- [ ] **Proxmox CSI Driver Installation**
+  - Deploy `cozy-proxmox-csi-operator` chart
+  - Configure storage classes
+  - Setup volume provisioning
 
-- [ ] **Тестування storage функціональності**
-  - Запуск `step5-csi-storage/test_proxmox_csi.py`
-  - Тестування dynamic volume provisioning
-  - Валідація volume mounting
-  - Тестування snapshot функціональності
+- [ ] **Storage Functionality Testing**
+  - Run `step5-csi-storage/test_proxmox_csi.py`
+  - Test dynamic volume provisioning
+  - Validate volume mounting
+  - Test snapshot functionality
 
-### Phase 4: Моніторинг та безпека (Дні 12-14)
+### Phase 4: Monitoring and Security (Days 12-14)
 
-#### Task 4.1: Мережеві політики та безпека
-- [ ] **Налаштування мережевих політик**
-  - Запуск `step6-network-policies/test_network_policies.py`
-  - Конфігурація Cilium + Kube-OVN
-  - Тестування pod-to-pod connectivity
-  - Валідація network policy enforcement
+#### Task 4.1: Network Policies and Security
+- [ ] **Network Policies Setup**
+  - Run `step6-network-policies/test_network_policies.py`
+  - Configure Cilium + Kube-OVN
+  - Test pod-to-pod connectivity
+  - Validate network policy enforcement
 
-#### Task 4.2: Моніторинг та логування
-- [ ] **Налаштування моніторингу**
-  - Запуск `step7-monitoring/test_monitoring.py`
-  - Інтеграція з Prometheus/Grafana
-  - Налаштування Proxmox метрик
-  - Створення dashboard'ів
+#### Task 4.2: Monitoring and Logging
+- [ ] **Monitoring Setup**
+  - Run `step7-monitoring/test_monitoring.py`
+  - Integrate with Prometheus/Grafana
+  - Configure Proxmox metrics
+  - Create dashboards
 
-#### Task 4.3: End-to-End тестування
-- [ ] **Повне інтеграційне тестування**
-  - Запуск `step8-e2e/test_e2e_integration.py`
-  - Тестування повного workload lifecycle
+#### Task 4.3: End-to-End Testing
+- [ ] **Complete Integration Testing**
+  - Run `step8-e2e/test_e2e_integration.py`
+  - Test complete workflow
   - Performance benchmarking
   - Reliability testing
 
-## 🎯 Критерії успіху
+## 🎯 Success Criteria
 
-### Технічні критерії
-- [ ] Всі 8 тестових кроків проходять успішно
-- [ ] Proxmox VMs створюються через Cluster API
-- [ ] Proxmox сервер працює як Kubernetes worker
-- [ ] CSI storage provisioning працює
-- [ ] Мережеві політики застосовуються
-- [ ] Моніторинг збирає метрики Proxmox
+### Technical Criteria
+- [ ] All 8 test steps pass successfully
+- [ ] Proxmox VMs are created via Cluster API
+- [ ] Proxmox server works as Kubernetes worker
+- [ ] CSI storage provisioning works
+- [ ] Network policies are applied
+- [ ] Monitoring collects Proxmox metrics
 
-### Функціональні критерії
-- [ ] Можливість створювати VM через kubectl
-- [ ] Автоматичне масштабування worker nodes
-- [ ] Persistent storage для workloads
-- [ ] Network isolation між tenants
-- [ ] Centralized monitoring та logging
+### Functional Criteria
+- [ ] Ability to create VMs via kubectl
+- [ ] Automatic scaling of worker nodes
+- [ ] Persistent storage for workloads
+- [ ] Network isolation between tenants
+- [ ] Centralized monitoring and logging
 
-## 📊 Метрики прогресу
+## 📊 Progress Metrics
 
-### Щоденні метрики
-- Кількість завершених тестів
-- Відсоток успішних тестів
-- Кількість виявлених та виправлених проблем
-- Час виконання тестів
+### Daily Metrics
+- Number of completed tests
+- Percentage of successful tests
+- Number of identified and fixed issues
+- Test execution time
 
-### Тижневі метрики
-- Загальний прогрес по фазах
-- Кількість інтегрованих компонентів
-- Рівень готовності до production
+### Weekly Metrics
+- Overall progress by phases
+- Number of integrated components
+- Production readiness level
 
-## 🚨 Ризики та мітигація
+### Final Metrics
+- Test success rate: > 95%
+- Performance meets requirements: 100%
+- Documentation ready: 100%
+- Team trained: 100%
 
-### Технічні ризики
-1. **Несумісність версій**
-   - *Ризик*: Proxmox/Kubernetes версії несумісні
-   - *Мітигація*: Перевірка сумісності перед початком
+## 🚨 Risks and Mitigation
 
-2. **Мережеві проблеми**
-   - *Ризик*: Проблеми з мережевою підключенням
-   - *Мітигація*: Тестування мережі на початку
+### Technical Risks
+1. **Version Incompatibility**
+   - *Risk*: Proxmox/Kubernetes versions incompatible
+   - *Mitigation*: Check compatibility before start
 
-3. **Ресурсні обмеження**
-   - *Ризик*: Недостатньо ресурсів для тестування
-   - *Мітигація*: Оцінка ресурсів перед початком
+2. **Network Issues**
+   - *Risk*: Network connectivity problems
+   - *Mitigation*: Test network at the beginning
 
-### Процесні ризики
-1. **Затримки в тестуванні**
-   - *Ризик*: Тести займають більше часу
-   - *Мітигація*: Паралельне виконання де можливо
+3. **Resource Limitations**
+   - *Risk*: Insufficient resources for testing
+   - *Mitigation*: Assess resources before start
 
-2. **Складність налагодження**
-   - *Ризик*: Проблеми важко діагностувати
-   - *Мітигація*: Детальне логування та моніторинг
+### Process Risks
+1. **Testing Delays**
+   - *Risk*: Tests take more time
+   - *Mitigation*: Parallel execution where possible
 
-## 📝 Документація
+2. **Debugging Complexity**
+   - *Risk*: Problems hard to diagnose
+   - *Mitigation*: Detailed logging and monitoring
 
-### Створювані документи
-- [ ] **Runbook встановлення** - покрокова інструкція
-- [ ] **Runbook підтримки** - операційні процедури
-- [ ] **Troubleshooting guide** - вирішення проблем
-- [ ] **Performance tuning guide** - оптимізація
-- [ ] **Security checklist** - перевірка безпеки
+## 📝 Documentation
 
-### Оновлювані документи
-- [ ] **COMPLETE_INTEGRATION_GUIDE.md** - оновлення з результатами
-- [ ] **INTEGRATION_PLAN.md** - фінальний стан
-- [ ] **README.md** - загальна інформація
+### Documents to Create
+- [ ] **Installation Runbook** - Step-by-step installation guide
+- [ ] **Maintenance Runbook** - Operational procedures
+- [ ] **Troubleshooting Guide** - Problem resolution
+- [ ] **Performance Tuning Guide** - Optimization
+- [ ] **Security Checklist** - Security verification
 
-## 🔄 Процес розробки
+### Documents to Update
+- [ ] **COMPLETE_INTEGRATION_GUIDE.md** - Update with results
+- [ ] **INTEGRATION_PLAN.md** - Final state
+- [ ] **README.md** - General information
 
-### Щоденний процес
-1. **Ранкова синхронізація** (15 хв)
-   - Огляд прогресу за попередній день
-   - Планування завдань на поточний день
-   - Обговорення блокерів
+## 🔄 Development Process
 
-2. **Робочий процес**
-   - Виконання запланованих завдань
-   - Документування результатів
-   - Тестування та валідація
+### Daily Process
+1. **Morning Sync** (15 min)
+   - Review previous day progress
+   - Plan tasks for current day
+   - Discuss blockers
 
-3. **Вечірня ретроспектива** (15 хв)
-   - Огляд завершених завдань
-   - Виявлення проблем та рішень
-   - Планування на наступний день
+2. **Work Process**
+   - Execute planned tasks
+   - Document results
+   - Test and validate
 
-### Тижневий процес
-1. **Понеділок**: Планування тижня та початок Phase
-2. **Середа**: Проміжний огляд прогресу
-3. **П'ятниця**: Завершення Phase та планування наступної
+3. **Evening Retrospective** (15 min)
+   - Review completed tasks
+   - Identify problems and solutions
+   - Plan for next day
 
-## 📞 Команда та відповідальність
+### Weekly Process
+1. **Monday**: Week planning and Phase start
+2. **Wednesday**: Mid-week progress review
+3. **Friday**: Phase completion and next phase planning
 
-### Ролі
-- **Tech Lead**: Загальна координація та архітектурні рішення
-- **DevOps Engineer**: Налаштування інфраструктури та CI/CD
-- **QA Engineer**: Тестування та валідація
-- **Documentation**: Створення та підтримка документації
+## 📞 Team and Responsibilities
 
-### Комунікація
+### Roles
+- **Tech Lead**: Overall coordination and architectural decisions
+- **DevOps Engineer**: Infrastructure setup and CI/CD
+- **QA Engineer**: Testing and validation
+- **Documentation**: Create and maintain documentation
+
+### Communication
 - **Slack**: #proxmox-integration
 - **Daily Standup**: 9:00 AM
-- **Weekly Review**: П'ятниця 4:00 PM
+- **Weekly Review**: Friday 4:00 PM
 - **Emergency**: @oncall
 
-## 🎉 Критерії завершення спринту
+## 🎉 Sprint Completion Criteria
 
-Спринт вважається успішним, якщо:
-- [ ] Всі 8 тестових кроків проходять успішно
-- [ ] Створена повна документація
-- [ ] Runbook готовий до використання
-- [ ] Performance benchmarks виконані
-- [ ] Security audit пройдений
-- [ ] Команда готова до production deployment
+Sprint is considered successful if:
+- [ ] All 8 test steps pass successfully
+- [ ] Complete documentation is created
+- [ ] Runbook is ready for use
+- [ ] Performance benchmarks are completed
+- [ ] Security audit is passed
+- [ ] Team is ready for production deployment
 
-**Результат**: Повнофункціональна інтеграція Proxmox з CozyStack готова до production використання! 🚀
+**Result**: Fully functional Proxmox integration with CozyStack ready for production use! 🚀

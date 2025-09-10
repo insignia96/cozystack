@@ -1,262 +1,262 @@
 # Proxmox Integration Testing Plan
 
-## 🎯 Огляд тестування
+## 🎯 Testing Overview
 
-Цей документ описує комплексний план тестування інтеграції Proxmox VE з CozyStack платформою. Тестування розділене на 8 етапів, кожен з яких перевіряє конкретні аспекти інтеграції.
+This document describes a comprehensive testing plan for Proxmox VE integration with CozyStack platform. Testing is divided into 8 stages, each checking specific aspects of the integration.
 
-## 📋 Структура тестування
+## 📋 Testing Structure
 
-### Етап 1: Proxmox API Connection Testing
-**Мета**: Перевірка базового підключення та аутентифікації до Proxmox VE API
+### Stage 1: Proxmox API Connection Testing
+**Goal**: Verify basic connection and authentication to Proxmox VE API
 
-#### Тестові сценарії
+#### Test Scenarios
 1. **API Connectivity Test**
-   - Перевірка доступності Proxmox API endpoint
-   - Тестування SSL/TLS з'єднання
-   - Валідація response time (< 2 секунди)
-   - Перевірка HTTP status codes
+   - Check Proxmox API endpoint availability
+   - Test SSL/TLS connection
+   - Validate response time (< 2 seconds)
+   - Check HTTP status codes
 
 2. **Authentication Test**
-   - Тестування username/password аутентифікації
-   - Тестування token-based аутентифікації
-   - Перевірка invalid credentials handling
-   - Тестування session timeout
+   - Test username/password authentication
+   - Test token-based authentication
+   - Check invalid credentials handling
+   - Test session timeout
 
 3. **Permission Validation Test**
-   - Перевірка необхідних дозволів для Kubernetes
-   - Тестування VM management permissions
-   - Перевірка storage access permissions
-   - Тестування network configuration permissions
+   - Check required permissions for Kubernetes
+   - Test VM management permissions
+   - Check storage access permissions
+   - Test network configuration permissions
 
-#### Критерії успіху
-- ✅ API доступний з response time < 2s
-- ✅ Аутентифікація працює для обох методів
-- ✅ Всі необхідні дозволи надані
-- ✅ Error handling працює коректно
+#### Success Criteria
+- ✅ API available with response time < 2s
+- ✅ Authentication works for both methods
+- ✅ All required permissions granted
+- ✅ Error handling works correctly
 
-### Етап 2: Network and Storage Configuration Testing
-**Мета**: Валідація мережевої та сховищної конфігурації Proxmox для Kubernetes
+### Stage 2: Network and Storage Configuration Testing
+**Goal**: Validate Proxmox network and storage configuration for Kubernetes
 
-#### Тестові сценарії
+#### Test Scenarios
 1. **Network Configuration Test**
-   - Перевірка network bridges (vmbr0+)
-   - Тестування VLAN конфігурації
-   - Валідація Software Defined Networks (SDN)
-   - Перевірка network isolation
+   - Check network bridges (vmbr0+)
+   - Test VLAN configuration
+   - Validate Software Defined Networks (SDN)
+   - Check network isolation
 
 2. **Storage Configuration Test**
-   - Перевірка storage pools для Kubernetes
-   - Тестування content types (images, templates)
-   - Валідація storage space availability
-   - Перевірка storage permissions
+   - Check storage pools for Kubernetes
+   - Test content types (images, templates)
+   - Validate storage space availability
+   - Check storage permissions
 
 3. **Resource Availability Test**
-   - Перевірка CPU ресурсів
-   - Тестування RAM availability
-   - Валідація disk space
-   - Перевірка network bandwidth
+   - Check CPU resources
+   - Test RAM availability
+   - Validate disk space
+   - Check network bandwidth
 
-#### Критерії успіху
-- ✅ Мережеві мости налаштовані правильно
-- ✅ Storage pools доступні та мають достатньо місця
-- ✅ Ресурси достатні для Kubernetes workloads
-- ✅ Network isolation працює
+#### Success Criteria
+- ✅ Network bridges configured correctly
+- ✅ Storage pools available and have sufficient space
+- ✅ Resources sufficient for Kubernetes workloads
+- ✅ Network isolation works
 
-### Етап 3: VM Management via Cluster API Testing
-**Мета**: Тестування створення та управління VM через Cluster API Proxmox provider
+### Stage 3: VM Management via Cluster API Testing
+**Goal**: Test VM creation and management through Cluster API Proxmox provider
 
-#### Тестові сценарії
+#### Test Scenarios
 1. **Cluster API Components Test**
-   - Перевірка CAPI operator встановлення
-   - Тестування CRD registration
-   - Валідація InfrastructureProvider
-   - Перевірка controller deployment
+   - Check CAPI operator installation
+   - Test CRD registration
+   - Validate InfrastructureProvider
+   - Check controller deployment
 
 2. **Proxmox Provider Test**
-   - Тестування ProxmoxCluster resource creation
-   - Перевірка ProxmoxMachine resource management
-   - Валідація VM provisioning process
-   - Тестування VM lifecycle operations
+   - Test ProxmoxCluster resource creation
+   - Check ProxmoxMachine resource management
+   - Validate VM provisioning process
+   - Test VM lifecycle operations
 
 3. **VM Operations Test**
-   - Створення VM з template
-   - Тестування VM start/stop/restart
-   - Перевірка VM configuration updates
-   - Тестування VM deletion
+   - Create VM from template
+   - Test VM start/stop/restart
+   - Check VM configuration updates
+   - Test VM deletion
 
-#### Критерії успіху
-- ✅ CAPI провайдер встановлений та працює
-- ✅ VM створюються через Cluster API
-- ✅ VM lifecycle operations працюють
-- ✅ Error handling та cleanup працюють
+#### Success Criteria
+- ✅ CAPI provider installed and working
+- ✅ VMs created via Cluster API
+- ✅ VM lifecycle operations work
+- ✅ Error handling and cleanup work
 
-### Етап 4: Proxmox Worker Integration Testing
-**Мета**: Валідація Proxmox сервера як Kubernetes worker node
+### Stage 4: Proxmox Worker Integration Testing
+**Goal**: Validate Proxmox server as Kubernetes worker node
 
-#### Тестові сценарії
+#### Test Scenarios
 1. **Worker Node Setup Test**
-   - Тестування Helm chart deployment
-   - Перевірка kubeadm join process
-   - Валідація node registration
-   - Тестування node readiness
+   - Test Helm chart deployment
+   - Check kubeadm join process
+   - Validate node registration
+   - Test node readiness
 
 2. **Worker Functionality Test**
-   - Перевірка pod scheduling
-   - Тестування resource allocation
-   - Валідація node labels та taints
-   - Перевірка pod execution
+   - Check pod scheduling
+   - Test resource allocation
+   - Validate node labels and taints
+   - Check pod execution
 
 3. **Integration Test**
-   - Тестування communication з control plane
-   - Перевірка network connectivity
-   - Валідація storage access
-   - Тестування monitoring integration
+   - Test communication with control plane
+   - Check network connectivity
+   - Validate storage access
+   - Test monitoring integration
 
-#### Критерії успіху
-- ✅ Proxmox сервер приєднався як worker node
-- ✅ Pods можуть бути scheduled на worker
-- ✅ Resource allocation працює правильно
-- ✅ Node labels та taints налаштовані
+#### Success Criteria
+- ✅ Proxmox server joined as worker node
+- ✅ Pods can be scheduled on worker
+- ✅ Resource allocation works correctly
+- ✅ Node labels and taints configured
 
-### Етап 5: CSI Storage Integration Testing
-**Мета**: Тестування persistent storage через Proxmox CSI driver
+### Stage 5: CSI Storage Integration Testing
+**Goal**: Test persistent storage through Proxmox CSI driver
 
-#### Тестові сценарії
+#### Test Scenarios
 1. **CSI Driver Test**
-   - Перевірка CSI driver installation
-   - Тестування driver health
-   - Валідація driver capabilities
-   - Перевірка driver logs
+   - Check CSI driver installation
+   - Test driver health
+   - Validate driver capabilities
+   - Check driver logs
 
 2. **Storage Class Test**
-   - Тестування storage class creation
-   - Перевірка storage class parameters
-   - Валідація volume provisioning
-   - Тестування volume binding
+   - Test storage class creation
+   - Check storage class parameters
+   - Validate volume provisioning
+   - Test volume binding
 
 3. **Volume Operations Test**
-   - Тестування dynamic volume provisioning
-   - Перевірка volume mounting
-   - Валідація volume expansion
-   - Тестування volume snapshots
+   - Test dynamic volume provisioning
+   - Check volume mounting
+   - Validate volume expansion
+   - Test volume snapshots
 
-#### Критерії успіху
-- ✅ CSI driver встановлений та healthy
-- ✅ Storage classes створені та працюють
-- ✅ Dynamic volume provisioning працює
-- ✅ Volume operations виконуються успішно
+#### Success Criteria
+- ✅ CSI driver installed and healthy
+- ✅ Storage classes created and working
+- ✅ Dynamic volume provisioning works
+- ✅ Volume operations execute successfully
 
-### Етап 6: Network Policies Testing
-**Мета**: Валідація мережевих політик та CNI інтеграції
+### Stage 6: Network Policies Testing
+**Goal**: Validate network policies and CNI integration
 
-#### Тестові сценарії
+#### Test Scenarios
 1. **CNI Integration Test**
-   - Перевірка CNI plugin installation (Cilium, Kube-OVN)
-   - Тестування pod networking
-   - Валідація service discovery
-   - Перевірка DNS resolution
+   - Check CNI plugin installation (Cilium, Kube-OVN)
+   - Test pod networking
+   - Validate service discovery
+   - Check DNS resolution
 
 2. **Network Policy Test**
-   - Тестування network policy creation
-   - Перевірка policy enforcement
-   - Валідація traffic filtering
-   - Тестування policy updates
+   - Test network policy creation
+   - Check policy enforcement
+   - Validate traffic filtering
+   - Test policy updates
 
 3. **Security Test**
-   - Перевірка pod-to-pod communication
-   - Тестування external access
-   - Валідація network isolation
-   - Перевірка security policies
+   - Check pod-to-pod communication
+   - Test external access
+   - Validate network isolation
+   - Check security policies
 
-#### Критерії успіху
-- ✅ CNI plugins працюють правильно
-- ✅ Network policies застосовуються
-- ✅ Pod networking працює
-- ✅ Security policies діють
+#### Success Criteria
+- ✅ CNI plugins work correctly
+- ✅ Network policies are applied
+- ✅ Pod networking works
+- ✅ Security policies are active
 
-### Етап 7: Monitoring and Logging Testing
-**Мета**: Тестування моніторингу та логування Proxmox ресурсів
+### Stage 7: Monitoring and Logging Testing
+**Goal**: Test monitoring and logging for Proxmox resources
 
-#### Тестові сценарії
+#### Test Scenarios
 1. **Monitoring Stack Test**
-   - Перевірка Prometheus deployment
-   - Тестування Grafana setup
-   - Валідація metrics collection
-   - Перевірка alerting rules
+   - Check Prometheus deployment
+   - Test Grafana setup
+   - Validate metrics collection
+   - Check alerting rules
 
 2. **Proxmox Metrics Test**
-   - Тестування Proxmox metrics collection
-   - Перевірка node exporter
-   - Валідація custom metrics
-   - Тестування metrics export
+   - Test Proxmox metrics collection
+   - Check node exporter
+   - Validate custom metrics
+   - Test metrics export
 
 3. **Logging Test**
-   - Перевірка log aggregation
-   - Тестування log parsing
-   - Валідація log retention
-   - Перевірка log search
+   - Check log aggregation
+   - Test log parsing
+   - Validate log retention
+   - Check log search
 
-#### Критерії успіху
-- ✅ Monitoring stack працює
-- ✅ Proxmox метрики збираються
-- ✅ Grafana dashboard'и створені
-- ✅ Logging працює правильно
+#### Success Criteria
+- ✅ Monitoring stack works
+- ✅ Proxmox metrics collected
+- ✅ Grafana dashboards created
+- ✅ Logging works correctly
 
-### Етап 8: End-to-End Integration Testing
-**Мета**: Комплексне тестування всієї інтеграції
+### Stage 8: End-to-End Integration Testing
+**Goal**: Comprehensive testing of entire integration
 
-#### Тестові сценарії
+#### Test Scenarios
 1. **Complete Workflow Test**
-   - Тестування повного lifecycle workload
-   - Перевірка multi-workload deployment
-   - Валідація resource management
-   - Тестування scaling operations
+   - Test complete workload lifecycle
+   - Check multi-workload deployment
+   - Validate resource management
+   - Test scaling operations
 
 2. **Performance Test**
-   - Benchmarking VM creation time
-   - Тестування storage performance
-   - Перевірка network throughput
-   - Валідація resource utilization
+   - Benchmark VM creation time
+   - Test storage performance
+   - Check network throughput
+   - Validate resource utilization
 
 3. **Reliability Test**
-   - Тестування fault tolerance
-   - Перевірка recovery procedures
-   - Валідація backup/restore
-   - Тестування upgrade procedures
+   - Test fault tolerance
+   - Check recovery procedures
+   - Validate backup/restore
+   - Test upgrade procedures
 
-#### Критерії успіху
-- ✅ Всі компоненти працюють разом
-- ✅ Performance відповідає вимогам
-- ✅ Система надійна та стабільна
-- ✅ Backup/restore працює
+#### Success Criteria
+- ✅ All components work together
+- ✅ Performance meets requirements
+- ✅ System is reliable and stable
+- ✅ Backup/restore works
 
-## 🧪 Тестове середовище
+## 🧪 Test Environment
 
-### Системні вимоги
-- **Proxmox VE**: 7.0+ з 8GB+ RAM
-- **Kubernetes**: 1.26+ з 3+ nodes
-- **Network**: Low latency між K8s та Proxmox
-- **Storage**: 100GB+ для тестових VM
+### System Requirements
+- **Proxmox VE**: 7.0+ with 8GB+ RAM
+- **Kubernetes**: 1.26+ with 3+ nodes
+- **Network**: Low latency between K8s and Proxmox
+- **Storage**: 100GB+ for test VMs
 
-### Тестові дані
+### Test Data
 - **VM Templates**: Ubuntu 22.04, CentOS 8
 - **Test Workloads**: nginx, redis, postgres
 - **Storage Classes**: proxmox-csi, local-storage
 - **Network Policies**: deny-all, allow-specific
 
-## 📊 Метрики тестування
+## 📊 Testing Metrics
 
 ### Performance Metrics
-- **API Response Time**: < 2 секунди
-- **VM Creation Time**: < 5 хвилин
-- **Volume Provisioning**: < 30 секунд
-- **Pod Startup Time**: < 2 хвилини
+- **API Response Time**: < 2 seconds
+- **VM Creation Time**: < 5 minutes
+- **Volume Provisioning**: < 30 seconds
+- **Pod Startup Time**: < 2 minutes
 
 ### Reliability Metrics
 - **Test Success Rate**: > 95%
 - **System Uptime**: > 99%
 - **Error Rate**: < 1%
-- **Recovery Time**: < 10 хвилин
+- **Recovery Time**: < 10 minutes
 
 ### Resource Metrics
 - **CPU Utilization**: < 80%
@@ -264,112 +264,112 @@
 - **Disk I/O**: < 70%
 - **Network Bandwidth**: < 60%
 
-## 🔧 Налаштування тестування
+## 🔧 Test Configuration
 
-### Конфігурація тестів
+### Test Parameters
 ```bash
-# Основні параметри
+# Basic parameters
 PROXMOX_HOST="192.168.1.100"
 PROXMOX_USERNAME="k8s-api@pve"
 PROXMOX_PASSWORD="secure-password"
 K8S_ENDPOINT="https://k8s-master:6443"
 
-# Тестові параметри
+# Test parameters
 TEST_NAMESPACE="proxmox-test"
 TEST_VM_TEMPLATE="ubuntu-22.04-cloud"
 TEST_STORAGE_POOL="proxmox-k8s"
 TEST_NETWORK_BRIDGE="vmbr0"
 
-# Performance параметри
+# Performance parameters
 PERF_VM_COUNT=10
 PERF_VOLUME_SIZE="10Gi"
 PERF_TEST_DURATION="300s"
 ```
 
-### Запуск тестів
+### Running Tests
 ```bash
-# Всі тести
+# All tests
 ./run-all-tests.sh
 
-# Конкретний етап
+# Specific stage
 ./run-all-tests.sh -s 3
 
-# З детальним логуванням
+# With detailed logging
 ./run-all-tests.sh -v
 
-# З збереженням ресурсів
+# With resource preservation
 KEEP_TEST_RESOURCES=true ./run-all-tests.sh
 ```
 
-## 📈 Звітність
+## 📈 Reporting
 
-### Тестові звіти
+### Test Reports
 - **Individual Test Logs**: `logs/stepX-*/test_*.log`
 - **Summary Report**: `logs/test_report_TIMESTAMP.md`
 - **Combined Log**: `logs/test_run_TIMESTAMP.log`
 - **Performance Report**: `logs/performance_TIMESTAMP.json`
 
-### Метрики звітів
-- **Test Coverage**: Відсоток покриття тестами
-- **Success Rate**: Відсоток успішних тестів
-- **Performance**: Час виконання тестів
-- **Issues**: Список виявлених проблем
+### Report Metrics
+- **Test Coverage**: Percentage of test coverage
+- **Success Rate**: Percentage of successful tests
+- **Performance**: Test execution time
+- **Issues**: List of identified problems
 
 ## 🚨 Troubleshooting
 
-### Загальні проблеми
+### Common Issues
 1. **API Connection Issues**
-   - Перевірка мережевої підключенності
-   - Валідація SSL сертифікатів
-   - Перевірка credentials
+   - Check network connectivity
+   - Validate SSL certificates
+   - Check credentials
 
 2. **CAPI Provider Issues**
-   - Перевірка CRD встановлення
-   - Валідація controller logs
-   - Перевірка permissions
+   - Check CRD installation
+   - Validate controller logs
+   - Check permissions
 
 3. **Storage Issues**
-   - Перевірка CSI driver
-   - Валідація storage classes
-   - Перевірка volume provisioning
+   - Check CSI driver
+   - Validate storage classes
+   - Check volume provisioning
 
 4. **Network Issues**
-   - Перевірка CNI plugins
-   - Валідація network policies
-   - Перевірка pod connectivity
+   - Check CNI plugins
+   - Validate network policies
+   - Check pod connectivity
 
-### Debug команди
+### Debug Commands
 ```bash
-# API тестування
+# API testing
 curl -k -u k8s-api@pve:password https://192.168.1.100:8006/api2/json/version
 
-# CAPI перевірка
+# CAPI check
 kubectl get clusters,machines,proxmoxclusters,proxmoxmachines -A
 
-# Storage перевірка
+# Storage check
 kubectl get pv,pvc,storageclass,csidriver
 
-# Network перевірка
+# Network check
 kubectl get pods -o wide
 kubectl get networkpolicy -A
 ```
 
-## 📚 Документація
+## 📚 Documentation
 
-### Тестові документи
-- **Test Cases**: Детальні тестові сценарії
-- **Test Data**: Тестові дані та конфігурації
-- **Test Results**: Результати тестування
-- **Troubleshooting Guide**: Керівництво з вирішення проблем
+### Test Documents
+- **Test Cases**: Detailed test scenarios
+- **Test Data**: Test data and configurations
+- **Test Results**: Test execution results
+- **Troubleshooting Guide**: Problem resolution guide
 
-### Оновлення документації
-- Після кожного тестового циклу
-- При виявленні нових проблем
-- При зміні конфігурації
-- При додаванні нових тестів
+### Documentation Updates
+- After each test cycle
+- When new problems are identified
+- When configuration changes
+- When new tests are added
 
 ---
 
-**Останнє оновлення**: 2024-01-15  
-**Версія**: 1.0.0  
-**Автор**: CozyStack Team
+**Last Updated**: 2025-09-10  
+**Version**: 1.0.0  
+**Author**: CozyStack Team
