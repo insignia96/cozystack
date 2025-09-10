@@ -19,7 +19,7 @@ kubeapps:
     image:
       registry: ghcr.io/cozystack/cozystack
       repository: dashboard
-      tag: v0.35.4
+      tag: v0.35.5
       digest: "sha256:54906b3d2492c8603a347a5938b6db36e5ed5c4149111cae1804ac9110361947"
   redis:
     master:
@@ -37,8 +37,8 @@ kubeapps:
     image:
       registry: ghcr.io/cozystack/cozystack
       repository: kubeapps-apis
-      tag: v0.35.4
-      digest: "sha256:41d8ff62fca95119ee9137a0776b879ee7daf6aa22baaac072176098f675d777"
+      tag: v0.35.5
+      digest: "sha256:2cb21384385efbe2003abfe40acc1544e0cf6b11e1bdb9f7a7755c603620f774"
     pluginConfig:
       flux:
         packages:
