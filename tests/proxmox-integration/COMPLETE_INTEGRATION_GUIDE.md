@@ -253,7 +253,7 @@ E2E_CLEANUP_ON_FAILURE="true"
 4. **Network Policy Issues**
    ```bash
    # Check CNI status
-   kubectl get pods -n kube-system | grep -E "(cilium|calico|flannel)"
+   kubectl get pods -n kube-system | grep -E "(cilium)"
    
    # Verify network policies
    kubectl get networkpolicy -A
