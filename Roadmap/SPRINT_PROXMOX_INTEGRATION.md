@@ -2,39 +2,39 @@
 
 ## 🎯 Sprint Overview
 
-**Sprint Goal**: Повна інтеграція Proxmox VE з CozyStack платформою для створення гібридної інфраструктури з можливістю управління віртуальними машинами через Kubernetes API.
+**Sprint Goal**: Complete integration of Proxmox VE with CozyStack platform to create hybrid infrastructure with the ability to manage virtual machines through Kubernetes API.
 
-**Duration**: 2 тижні (14 днів)  
+**Duration**: 2 weeks (14 days)  
 **Start Date**: 2024-01-15  
 **End Date**: 2024-01-29  
 
 ## 📋 Sprint Tasks
 
-### Phase 1: Підготовка та налаштування (Дні 1-3)
+### Phase 1: Preparation and Setup (Days 1-3)
 
-#### Task 1.1: Аналіз поточної інфраструктури
-- [ ] **Оцінка Proxmox сервера**
-  - Перевірка версії Proxmox VE (мінімум 7.0+)
-  - Аналіз наявних ресурсів (CPU, RAM, Storage)
-  - Перевірка мережевої конфігурації
-  - Валідація SSL сертифікатів
+#### Task 1.1: Current Infrastructure Analysis
+- [ ] **Proxmox Server Assessment**
+  - Check Proxmox VE version (minimum 7.0+)
+  - Analyze available resources (CPU, RAM, Storage)
+  - Verify network configuration
+  - Validate SSL certificates
 
-- [ ] **Оцінка CozyStack кластера**
-  - Перевірка версії Kubernetes (мінімум 1.26+)
-  - Аналіз наявних компонентів CozyStack
-  - Перевірка Cluster API оператора
-  - Валідація мережевої підключення
+- [ ] **CozyStack Cluster Assessment**
+  - Check Kubernetes version (minimum 1.26+)
+  - Analyze existing CozyStack components
+  - Verify Cluster API operator
+  - Validate network connectivity
 
-#### Task 1.2: Підготовка тестового середовища
-- [ ] **Налаштування тестових скриптів**
-  - Копіювання `tests/proxmox-integration/` в робочу директорію
-  - Налаштування `config.env` з реальними параметрами
-  - Встановлення залежностей Python (pytest, requests, etc.)
+#### Task 1.2: Test Environment Preparation
+- [ ] **Test Scripts Setup**
+  - Copy `tests/proxmox-integration/` to working directory
+  - Configure `config.env` with real parameters
+  - Install Python dependencies (pytest, requests, etc.)
 
-- [ ] **Створення тестових ресурсів**
-  - Створення тестового namespace в Kubernetes
-  - Підготовка тестових VM шаблонів в Proxmox
-  - Налаштування тестових storage pools
+- [ ] **Test Resources Creation**
+  - Create test namespace in Kubernetes
+  - Prepare test VM templates in Proxmox
+  - Configure test storage pools
 
 ### Phase 2: Базова інтеграція (Дні 4-7)
 
