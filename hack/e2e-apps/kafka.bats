@@ -5,7 +5,6 @@
   withResources='true'
   if [ "$withResources" == 'true' ]; then
     resources=$(cat <<EOF
-resources:
   resources:
     cpu: 500m
     memory: 768Mi

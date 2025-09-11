@@ -48,7 +48,7 @@ spec:
 EOF
   sleep 10
   kubectl -n tenant-test wait --timeout=30s hr mysql-$name --for=condition=ready
-  kubectl -n tenant-test wait --timeout=130s mysqls $name --for=condition=ready
+  kubectl -n tenant-test wait --timeout=130s mysqls.apps.cozystack.io $name --for=condition=ready
   kubectl -n tenant-test wait --timeout=110s sts mysql-$name --for=jsonpath='{.status.replicas}'=2
   sleep 60
   kubectl -n tenant-test wait --timeout=60s deploy mysql-$name-metrics --for=jsonpath='{.status.replicas}'=1

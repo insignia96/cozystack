@@ -29,10 +29,10 @@ EOF
   withResources='true'
   if [ "$withResources" == 'true' ]; then
     cores="1000m"
-    memory="1Gi
+    memory="1Gi"
   else
     cores="2000m"
-    memory="2Gi
+    memory="2Gi"
   fi
   kubectl -n tenant-test get vminstances.apps.cozystack.io $name || 
   kubectl create -f - <<EOF

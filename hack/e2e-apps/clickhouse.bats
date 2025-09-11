@@ -46,6 +46,12 @@ EOF
   kubectl -n tenant-test wait --timeout=40s hr clickhouse-$name --for=condition=ready
   kubectl -n tenant-test wait --timeout=130s clickhouses $name --for=condition=ready
   kubectl -n tenant-test wait --timeout=120s sts chi-clickhouse-$name-clickhouse-0-0 --for=jsonpath='{.status.replicas}'=1
-  timeout 210 sh -ec "until kubectl -n tenant-test wait svc chendpoint-clickhouse-$name --for=jsonpath='{.spec.ports[0].port}'=8123; do sleep 10; done"
+  timeout 210 sh -ec "
+    until [ \"\$(kubectl -n tenant-test get svc chendpoint-clickhouse-$name \
+      -o jsonpath='{.spec.ports[?(@.port==8123)].port}')\" = \"8123\" ]; do
+      echo 'Waiting for ClickHouse service port 8123...'
+      sleep 10
+    done
+  "
   kubectl -n tenant-test delete clickhouse.apps.cozystack.io $name
 }
