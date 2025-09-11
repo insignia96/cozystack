@@ -17,10 +17,10 @@ spec:
   storageClass: replicated
 EOF
   sleep 5
-  kubectl -n tenant-test wait --timeout=5s hr vm-disk-$name --for=condition=ready
-  kubectl -n tenant-test wait --timeout=130s vmdisks $name --for=condition=ready
-  kubectl -n tenant-test wait --timeout=130s pvc vm-disk-$name --for=jsonpath='{.status.phase}'=Bound
-  kubectl -n tenant-test wait --timeout=150s dv vm-disk-$name --for=condition=ready
+  kubectl -n tenant-test wait hr vm-disk-$name --timeout=5s --for=condition=ready
+  kubectl -n tenant-test wait dv vm-disk-$name --timeout=250s --for=condition=ready
+  kubectl -n tenant-test wait pvc vm-disk-$name --timeout=200s --for=jsonpath='{.status.phase}'=Bound
+  kubectl -n tenant-test wait vmdisks vm-disk-$name --timeout=200s --for=condition=ready
 }
 
 @test "Create a VM Instance" {

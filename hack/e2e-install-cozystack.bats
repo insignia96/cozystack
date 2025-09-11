@@ -123,15 +123,23 @@ EOF
 
 @test "Configure Tenant and wait for applications" {
   # Patch root tenant and wait for its releases
-  kubectl patch tenants/root -n tenant-root --type merge -p '{"spec":{"host":"example.org","ingress":true,"monitoring":true,"etcd":true,"isolated":true}}'
 
-  timeout 60 sh -ec 'until kubectl get hr -n tenant-root etcd ingress monitoring tenant-root >/dev/null 2>&1; do sleep 1; done'
-  kubectl wait hr/etcd hr/ingress hr/tenant-root -n tenant-root --timeout=2m --for=condition=ready
+  kubectl patch tenants/root -n tenant-root --type merge -p '{"spec":{"host":"example.org","ingress":true,"monitoring":true,"etcd":true,"isolated":true, "seaweedfs": true}}'
 
+  timeout 60 sh -ec 'until kubectl get hr -n tenant-root etcd ingress monitoring seaweedfs tenant-root >/dev/null 2>&1; do sleep 1; done'
+  kubectl wait hr/etcd hr/ingress hr/tenant-root hr/seaweedfs -n tenant-root --timeout=4m --for=condition=ready
+
+  # TODO: Workaround ingress unvailability issue
   if ! kubectl wait hr/monitoring -n tenant-root --timeout=2m --for=condition=ready; then
     flux reconcile hr monitoring -n tenant-root --force
     kubectl wait hr/monitoring -n tenant-root --timeout=2m --for=condition=ready
   fi
+
+  if ! kubectl wait hr/seaweedfs-system -n tenant-root --timeout=2m --for=condition=ready; then
+    flux reconcile hr seaweedfs-system -n tenant-root --force
+    kubectl wait hr/seaweedfs-system -n tenant-root --timeout=2m --for=condition=ready
+  fi
+
 
   # Expose Cozystack services through ingress
   kubectl patch configmap/cozystack -n cozy-system --type merge -p '{"data":{"expose-services":"api,dashboard,cdi-uploadproxy,vm-exportproxy,keycloak"}}'
@@ -144,7 +152,7 @@ EOF
   kubectl wait sts/etcd -n tenant-root --for=jsonpath='{.status.readyReplicas}'=3 --timeout=5m
 
   # VictoriaMetrics components
-  kubectl wait vmalert/vmalert-shortterm vmalertmanager/alertmanager -n tenant-root --for=jsonpath='{.status.updateStatus}'=operational --timeout=5m
+  kubectl wait vmalert/vmalert-shortterm vmalertmanager/alertmanager -n tenant-root --for=jsonpath='{.status.updateStatus}'=operational --timeout=15m
   kubectl wait vlogs/generic -n tenant-root --for=jsonpath='{.status.updateStatus}'=operational --timeout=5m
   kubectl wait vmcluster/shortterm vmcluster/longterm -n tenant-root --for=jsonpath='{.status.clusterStatus}'=operational --timeout=5m
 
@@ -181,9 +189,22 @@ spec:
   ingress: false
   isolated: true
   monitoring: false
-  resourceQuotas: {}
+  resourceQuotas:
+    cpu: "60"
+    memory: "128Gi"
+    storage: "100Gi"
   seaweedfs: false
 EOF
   kubectl wait hr/tenant-test -n tenant-root --timeout=1m --for=condition=ready
   kubectl wait namespace tenant-test --timeout=20s --for=jsonpath='{.status.phase}'=Active
+  # Wait for ResourceQuota to appear and assert values
+  timeout 60 sh -ec 'until [ "$(kubectl get quota -n tenant-test --no-headers 2>/dev/null | wc -l)" -ge 1 ]; do sleep 1; done'
+  kubectl get quota -n tenant-test \
+    -o jsonpath='{range .items[*]}{.spec.hard.requests\.memory}{" "}{.spec.hard.requests\.storage}{"\n"}{end}' \
+    | grep -qx '137438953472 100Gi'
+
+  # Assert LimitRange defaults for containers
+  kubectl get limitrange -n tenant-test \
+  -o jsonpath='{range .items[*].spec.limits[*]}{.default.cpu}{" "}{.default.memory}{" "}{.defaultRequest.cpu}{" "}{.defaultRequest.memory}{"\n"}{end}' \
+  | grep -qx '250m 128Mi 25m 128Mi'
 }

@@ -7,24 +7,17 @@ image: image-nginx
 
 image-nginx:
 	docker buildx build images/nginx-cache \
-		--provenance false \
-		--builder=$(BUILDER) \
-		--platform=$(PLATFORM) \
 		--tag $(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG)) \
 		--cache-from type=registry,ref=$(REGISTRY)/nginx-cache:latest \
 		--cache-to type=inline \
 		--metadata-file images/nginx-cache.json \
-		--push=$(PUSH) \
-		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
-		--load=$(LOAD)
+		$(BUILDX_ARGS)
 	echo "$(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG))@$$(yq e '."containerimage.digest"' images/nginx-cache.json -o json -r)" \
 		> images/nginx-cache.tag
 	rm -f images/nginx-cache.json
 
 generate:
-	readme-generator -v values.yaml -s values.schema.json -r README.md
-	yq -i -o json --indent 4 '.properties.haproxy.properties.resourcesPreset.enum = ["none", "nano", "micro", "small", "medium", "large", "xlarge", "2xlarge"]' values.schema.json
-	yq -i -o json --indent 4 '.properties.nginx.properties.resourcesPreset.enum = ["none", "nano", "micro", "small", "medium", "large", "xlarge", "2xlarge"]' values.schema.json
+	cozyvalues-gen -v values.yaml -s values.schema.json -r README.md
 
 update:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/chrislim2888/IP2Location-C-Library | awk -F'[/^]' 'END{print $$3}') && \

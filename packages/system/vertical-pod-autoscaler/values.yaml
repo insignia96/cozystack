@@ -1,6 +1,13 @@
+vpaForVPA: true
+
 vertical-pod-autoscaler:
   crds:
     enabled: false
+
+    image:
+      registry: docker.io
+      repository: alpine/k8s
+      tag: 1.33.4
 
   updater:
     resources:
@@ -23,12 +30,6 @@ vertical-pod-autoscaler:
       pod-namespace-label: namespace
       prometheus-address: http://vmselect-shortterm.tenant-root.svc.cozy.local:8481/select/0/prometheus/
       prometheus-cadvisor-job-name: cadvisor
-    resources:
-      limits:
-        memory: 160Mi
-      requests:
-        cpu: 100m
-        memory: 160Mi
 
   admissionController:
     resources:
