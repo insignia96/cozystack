@@ -4,7 +4,7 @@ kind: CustomColumnsOverride
 metadata:
   name: cozystack-workloadmonitors
 spec:
-  id: "factory-detail-workloadmonitors"
+  id: "factory-details-v1alpha1.apps.cozystack.io.workloadmonitors"
   additionalPrinterColumns:
     - jsonPath: .metadata.name
       name: NAME

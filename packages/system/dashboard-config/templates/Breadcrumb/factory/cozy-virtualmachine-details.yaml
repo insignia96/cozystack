@@ -1,0 +1,13 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: stock-project-factory-virtualmachine-details
+spec:
+  id: "stock-project-factory-virtualmachine-details"
+  breadcrumbItems:
+    - key: virtualmachines
+      label: "Virtual Machines"
+      link: "/openapi-ui/{clusterName}/{namespace}/api-table/apps.cozystack.io/v1alpha1/virtualmachines"
+    - key: virtualmachine
+      label: "{6}"

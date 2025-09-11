@@ -2,9 +2,11 @@
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
-  name: virtualmachine-detail
+  name: virtualmachine-details
 spec:
-  key: virtualmachine-detail
+  key: virtualmachine-details
+  sidebarTags:
+    - virtualmachine-sidebar
   withScrollableMainContentCard: true
   urlsToFetch:
     - "/api/clusters/{2}/k8s/apis/apps.cozystack.io/v1alpha1/namespaces/{3}/virtualmachines/{6}"
@@ -393,7 +395,7 @@ spec:
                           id: 2132
                           fetchUrl: "/api/clusters/{2}/k8s/apis/apps.cozystack.io/v1alpha1/namespaces/{3}/virtualmachines/{6}"
                           clusterNamePartOfUrl: "{2}"
-                          customizationId: "factory-virtualmachine-detail-status-conditions"
+                          customizationId: "factory-status-conditions"
                           baseprefix: "/openapi-ui"
                           withoutControls: true
                           pathToItems:
@@ -408,7 +410,7 @@ spec:
                   fetchUrl: "/api/clusters/{2}/k8s/apis/cozystack.io/v1alpha1/namespaces/{3}/workloadmonitors"
                   clusterNamePartOfUrl: "{2}"
                   baseprefix: "/openapi-ui"
-                  customizationId: "factory-detail-workloadmonitors"
+                  customizationId: "factory-details-v1alpha1.apps.cozystack.io.workloadmonitors"
                   pathToItems:
                     - items
                   labelsSelector:
@@ -436,7 +438,7 @@ spec:
                   fetchUrl: "/api/clusters/{2}/k8s/apis/core.cozystack.io/v1alpha1/namespaces/{3}/tenantsecrets"
                   clusterNamePartOfUrl: "{2}"
                   baseprefix: "/openapi-ui"
-                  customizationId: "factory-virtualmachine-detail-secrets"
+                  customizationId: "factory-virtualmachine-details-secret-list"
                   pathToItems:
                     - items
                   labelsSelector:

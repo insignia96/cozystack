@@ -1,0 +1,71 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  name: "stock-namespace-apps.cozystack.io.v1alpha1.virtualmachines"
+spec:
+  id: "stock-namespace-/apps.cozystack.io/v1alpha1/virtualmachines"
+  additionalPrinterColumns:
+    - jsonPath: .metadata.name
+      name: Name
+      type: factory
+      customProps:
+        disableEventBubbling: true
+        items:
+        {{ include "incloud-web-resources.icon" (dict
+            "text" "VM"
+            "title" "virtualmachine"
+            "backgroundColor" "#2b9af3"
+          )| nindent 8
+        }}
+        {{ include "incloud-web-resources.factory.linkblock" (dict
+            "reqIndex" 0
+            "type" "name"
+            "jsonPath" ".metadata.name"
+            "namespace" "{reqsJsonPath[0]['.metadata.namespace']['-']}"
+            "factory" "virtualmachine-details"
+          ) | nindent 12 
+        }}
+    - jsonPath: .metadata.namespace
+      name: Namespace
+      type: string
+    - jsonPath: .spec.running
+      name: Running
+      type: boolean
+    - jsonPath: .spec.instanceType
+      name: InstanceType
+      type: string
+    - jsonPath: .spec.instanceProfile
+      name: Profile
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Created
+      type: factory
+      customProps:
+        disableEventBubbling: true
+        items:
+        {{ include "incloud-web-resources.factory.timeblock" (dict
+          "req" ".metadata.creationTimestamp"
+          ) | nindent 8
+        }}
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  name: "factory-virtualmachine-details-secret-list"
+spec:
+  id: "factory-virtualmachine-details-secret-list"
+  additionalPrinterColumns:
+    - jsonPath: .metadata.name
+      name: NAME
+      type: string
+    - name: EternalCurse
+      type: factory
+      customProps:
+        disableEventBubbling: true
+        items:
+          - type: SecretBase64Plain
+            data:
+              id: example-secterbase64
+              plainTextValue: "hello"
+              base64Value: "{reqsJsonPath[0]['.data.userdata']['-']}"
