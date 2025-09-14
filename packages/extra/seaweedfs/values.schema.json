@@ -72,6 +72,12 @@
         "Client"
       ]
     },
+    "vpa": {
+      "description": "Vertical Pod Autoscaler configuration for each SeaweedFS component.",
+      "type": "object",
+      "default": {},
+      "x-kubernetes-preserve-unknown-fields": true
+    },
     "zones": {
       "description": "A map of zones for MultiZone topology. Each zone can have its own number of replicas and size.",
       "type": "object",
