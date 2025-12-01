@@ -87,6 +87,12 @@ releases:
   optional: true
   dependsOn: [cilium,cert-manager]
 
+- name: metrics-server
+  releaseName: metrics-server
+  chart: cozy-metrics-server
+  namespace: cozy-monitoring
+  dependsOn: [cilium]
+
 - name: victoria-metrics-operator
   releaseName: victoria-metrics-operator
   chart: cozy-victoria-metrics-operator
@@ -100,7 +106,7 @@ releases:
   namespace: cozy-monitoring
   privileged: true
   optional: true
-  dependsOn: [cilium,victoria-metrics-operator]
+  dependsOn: [cilium,victoria-metrics-operator,metrics-server]
   values:
     scrapeRules:
       etcd:

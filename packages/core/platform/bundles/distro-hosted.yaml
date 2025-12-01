@@ -55,6 +55,12 @@ releases:
   optional: true
   dependsOn: [cert-manager]
 
+- name: metrics-server
+  releaseName: metrics-server
+  chart: cozy-metrics-server
+  namespace: cozy-monitoring
+  dependsOn: []
+
 - name: victoria-metrics-operator
   releaseName: victoria-metrics-operator
   chart: cozy-victoria-metrics-operator
@@ -68,7 +74,7 @@ releases:
   namespace: cozy-monitoring
   privileged: true
   optional: true
-  dependsOn: [victoria-metrics-operator]
+  dependsOn: [victoria-metrics-operator, metrics-server]
   values:
     scrapeRules:
       etcd:
