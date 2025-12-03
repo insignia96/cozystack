@@ -1,5 +1,5 @@
-export NAME=victoria-metrics-operator
-export NAMESPACE=cozy-$(NAME)
+export NAME=prometheus-operator-crds
+export NAMESPACE=cozy-victoria-metrics-operator
 
 include ../../../scripts/package.mk
 
