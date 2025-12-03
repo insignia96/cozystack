@@ -45,8 +45,6 @@ spec:
   - name: {{ .Release.Name }}
     namespace: {{ .Release.Namespace }}
   {{- end }}
-  - name: {{ .Release.Name }}-cilium
-    namespace: {{ .Release.Namespace }}
 {{- if .Values.addons.certManager.valuesOverride }}
 ---
 apiVersion: v1
