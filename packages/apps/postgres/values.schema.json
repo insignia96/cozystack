@@ -243,6 +243,19 @@
           }
         }
       }
+    },
+    "version": {
+      "description": "PostgreSQL major version to deploy",
+      "type": "string",
+      "default": "v18",
+      "enum": [
+        "v18",
+        "v17",
+        "v16",
+        "v15",
+        "v14",
+        "v13"
+      ]
     }
   }
 }
