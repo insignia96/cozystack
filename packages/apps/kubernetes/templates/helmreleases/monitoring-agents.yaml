@@ -44,6 +44,10 @@ spec:
     namespace: {{ .Release.Namespace }}
   - name: {{ .Release.Name }}-vertical-pod-autoscaler-crds
     namespace: {{ .Release.Namespace }}
+  - name: {{ .Release.Name }}-prometheus-operator-crds
+    namespace: {{ .Release.Namespace }}
+  - name: {{ .Release.Name }}-metrics-server
+    namespace: {{ .Release.Namespace }}
   values:
     vmagent:
       externalLabels:

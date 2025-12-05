@@ -34,6 +34,16 @@ storageClass: ""
 external: false
 
 ##
+## @enum {string} Version
+## @value v11.8
+## @value v11.4
+## @value v10.11
+## @value v10.6
+
+## @param {Version} version - MariaDB major.minor version to deploy
+version: v11.8
+
+##
 ## @section Application-specific parameters
 ##
 

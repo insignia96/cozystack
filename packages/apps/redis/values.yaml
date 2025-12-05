@@ -33,6 +33,13 @@ storageClass: ""
 ## @param {bool} external - Enable external access from outside the cluster.
 external: false
 
+## @enum {string} Version
+## @value v8
+## @value v7
+
+## @param {Version} version - Redis major version to deploy
+version: v8
+
 ##
 ## @section Application-specific parameters
 ##

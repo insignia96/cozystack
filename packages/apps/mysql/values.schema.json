@@ -186,6 +186,17 @@
           }
         }
       }
+    },
+    "version": {
+      "description": "MariaDB major.minor version to deploy",
+      "type": "string",
+      "default": "v11.8",
+      "enum": [
+        "v11.8",
+        "v11.4",
+        "v10.11",
+        "v10.6"
+      ]
     }
   }
 }

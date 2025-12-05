@@ -86,18 +86,30 @@ releases:
   namespace: cozy-cert-manager
   dependsOn: [cert-manager]
 
+- name: prometheus-operator-crds
+  releaseName: prometheus-operator-crds
+  chart: cozy-prometheus-operator-crds
+  namespace: cozy-victoria-metrics-operator
+  dependsOn: []
+
+- name: metrics-server
+  releaseName: metrics-server
+  chart: cozy-metrics-server
+  namespace: cozy-monitoring
+  dependsOn: [prometheus-operator-crds]
+
 - name: victoria-metrics-operator
   releaseName: victoria-metrics-operator
   chart: cozy-victoria-metrics-operator
   namespace: cozy-victoria-metrics-operator
-  dependsOn: [cert-manager]
+  dependsOn: [cert-manager,prometheus-operator-crds]
 
 - name: monitoring-agents
   releaseName: monitoring-agents
   chart: cozy-monitoring-agents
   namespace: cozy-monitoring
   privileged: true
-  dependsOn: [victoria-metrics-operator, vertical-pod-autoscaler-crds]
+  dependsOn: [victoria-metrics-operator, vertical-pod-autoscaler-crds, metrics-server]
   values:
     scrapeRules:
       etcd:
