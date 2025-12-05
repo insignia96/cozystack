@@ -5,8 +5,8 @@ metadata:
   annotations:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-weight": "10"
-    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation,hook-failed
-  name: {{ .Release.Name }}-cleanup
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+  name: {{ .Release.Name }}-pre-cleanup
 spec:
   template:
     metadata:
@@ -65,7 +65,6 @@ spec:
 
               echo "Cleanup completed successfully"
 
-
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -73,7 +72,7 @@ metadata:
   name: {{ .Release.Name }}-cleanup
   annotations:
     helm.sh/hook: pre-delete
-    helm.sh/hook-delete-policy: before-hook-creation,hook-failed,hook-succeeded
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
     helm.sh/hook-weight: "0"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
