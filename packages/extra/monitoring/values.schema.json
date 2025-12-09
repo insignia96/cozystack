@@ -560,6 +560,28 @@
           }
         }
       }
+    },
+    "vmagent": {
+      "description": "Configuration for VictoriaMetrics Agent.",
+      "type": "object",
+      "default": {},
+      "properties": {
+        "externalLabels": {
+          "description": "External labels applied to all metrics.",
+          "default": {
+            "cluster": "cozystack"
+          }
+        },
+        "remoteWrite": {
+          "description": "Remote write configuration.",
+          "default": {
+            "urls": [
+              "http://vminsert-shortterm:8480/insert/0/prometheus",
+              "http://vminsert-longterm:8480/insert/0/prometheus"
+            ]
+          }
+        }
+      }
     }
   }
 }

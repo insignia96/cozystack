@@ -74,6 +74,18 @@ releases:
   namespace: cozy-system
   dependsOn: [cozystack-controller,cilium,cert-manager]
 
+- name: cozystack-resource-definition-crd
+  releaseName: cozystack-resource-definition-crd
+  chart: cozystack-resource-definition-crd
+  namespace: cozy-system
+  dependsOn: [cilium]
+
+- name: cozystack-resource-definitions
+  releaseName: cozystack-resource-definitions
+  chart: cozystack-resource-definitions
+  namespace: cozy-system
+  dependsOn: [cilium,cozystack-controller,cozystack-resource-definition-crd]
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
@@ -84,15 +96,26 @@ releases:
   releaseName: cert-manager-issuers
   chart: cozy-cert-manager-issuers
   namespace: cozy-cert-manager
-  optional: true
   dependsOn: [cilium,cert-manager]
+
+- name: prometheus-operator-crds
+  releaseName: prometheus-operator-crds
+  chart: cozy-prometheus-operator-crds
+  namespace: cozy-victoria-metrics-operator
+  dependsOn: []
+
+- name: metrics-server
+  releaseName: metrics-server
+  chart: cozy-metrics-server
+  namespace: cozy-monitoring
+  dependsOn: [cilium,prometheus-operator-crds]
 
 - name: victoria-metrics-operator
   releaseName: victoria-metrics-operator
   chart: cozy-victoria-metrics-operator
   namespace: cozy-victoria-metrics-operator
   optional: true
-  dependsOn: [cilium,cert-manager]
+  dependsOn: [cilium,cert-manager,prometheus-operator-crds]
 
 - name: monitoring-agents
   releaseName: monitoring-agents
@@ -100,7 +123,7 @@ releases:
   namespace: cozy-monitoring
   privileged: true
   optional: true
-  dependsOn: [cilium,victoria-metrics-operator]
+  dependsOn: [cilium,victoria-metrics-operator,metrics-server]
   values:
     scrapeRules:
       etcd:
@@ -192,7 +215,7 @@ releases:
   releaseName: snapshot-controller
   chart: cozy-snapshot-controller
   namespace: cozy-snapshot-controller
-  dependsOn: [cilium]
+  dependsOn: [cilium,cert-manager-issuers]
 
 - name: objectstorage-controller
   releaseName: objectstorage-controller

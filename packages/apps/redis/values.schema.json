@@ -82,6 +82,15 @@
       "description": "StorageClass used to store the data.",
       "type": "string",
       "default": ""
+    },
+    "version": {
+      "description": "Redis major version to deploy",
+      "type": "string",
+      "default": "v8",
+      "enum": [
+        "v8",
+        "v7"
+      ]
     }
   }
 }

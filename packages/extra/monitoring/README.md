@@ -91,3 +91,12 @@
 | `grafana.resources.limits.cpu`      | CPU limit.                               | `quantity` | `1`     |
 | `grafana.resources.limits.memory`   | Memory limit.                            | `quantity` | `1Gi`   |
 
+
+### Vmagent configuration
+
+| Name                     | Description                              | Type     | Value |
+| ------------------------ | ---------------------------------------- | -------- | ----- |
+| `vmagent`                | Configuration for VictoriaMetrics Agent. | `object` | `{}`  |
+| `vmagent.externalLabels` | External labels applied to all metrics.  | `object` | `{}`  |
+| `vmagent.remoteWrite`    | Remote write configuration.              | `object` | `{}`  |
+
