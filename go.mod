@@ -7,6 +7,7 @@ go 1.25.0
 require (
 	github.com/fluxcd/helm-controller/api v1.4.3
 	github.com/fluxcd/source-controller/api v1.7.4
+	github.com/fluxcd/source-watcher/api/v2 v2.0.3
 	github.com/go-logr/logr v1.4.3
 	github.com/go-logr/zapr v1.3.0
 	github.com/google/gofuzz v1.2.0
