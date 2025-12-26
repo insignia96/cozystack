@@ -61,13 +61,6 @@ const (
 	singularName           = "tenantmodule"
 )
 
-// Define the GroupVersionResource for HelmRelease
-var helmReleaseGVR = schema.GroupVersionResource{
-	Group:    "helm.toolkit.fluxcd.io",
-	Version:  "v2",
-	Resource: "helmreleases",
-}
-
 // REST implements the RESTStorage interface for TenantModule resources
 type REST struct {
 	c            client.Client
@@ -517,7 +510,7 @@ func (r *REST) getNamespace(ctx context.Context) (string, error) {
 	namespace, ok := request.NamespaceFrom(ctx)
 	if !ok {
 		err := fmt.Errorf("namespace not found in context")
-		klog.Errorf(err.Error())
+		klog.Error(err)
 		return "", err
 	}
 	return namespace, nil
@@ -596,10 +589,10 @@ func (r *REST) ConvertToTable(ctx context.Context, object runtime.Object, tableO
 	switch obj := object.(type) {
 	case *corev1alpha1.TenantModuleList:
 		table = r.buildTableFromTenantModules(obj.Items)
-		table.ListMeta.ResourceVersion = obj.ListMeta.ResourceVersion
+		table.ResourceVersion = obj.ResourceVersion
 	case *corev1alpha1.TenantModule:
 		table = r.buildTableFromTenantModule(*obj)
-		table.ListMeta.ResourceVersion = obj.GetResourceVersion()
+		table.ResourceVersion = obj.GetResourceVersion()
 	default:
 		resource := schema.GroupResource{}
 		if info, ok := request.RequestInfoFrom(ctx); ok {
