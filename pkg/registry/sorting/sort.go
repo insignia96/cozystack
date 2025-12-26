@@ -5,6 +5,7 @@ package sorting
 
 import (
 	"slices"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -28,13 +29,7 @@ func ByName[T any, PT interface {
 }](items []T) {
 	slices.SortFunc(items, func(a, b T) int {
 		pa, pb := PT(&a), PT(&b)
-		switch {
-		case pa.GetName() < pb.GetName():
-			return -1
-		case pa.GetName() > pb.GetName():
-			return 1
-		}
-		return 0
+		return strings.Compare(pa.GetName(), pb.GetName())
 	})
 }
 
@@ -46,15 +41,10 @@ func ByNamespacedName[T any, PT interface {
 }](items []T) {
 	slices.SortFunc(items, func(a, b T) int {
 		pa, pb := PT(&a), PT(&b)
-		aKey := pa.GetNamespace() + "/" + pa.GetName()
-		bKey := pb.GetNamespace() + "/" + pb.GetName()
-		switch {
-		case aKey < bKey:
-			return -1
-		case aKey > bKey:
-			return 1
+		if res := strings.Compare(pa.GetNamespace(), pb.GetNamespace()); res != 0 {
+			return res
 		}
-		return 0
+		return strings.Compare(pa.GetName(), pb.GetName())
 	})
 }
 
