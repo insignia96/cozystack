@@ -6,8 +6,6 @@ package sorting
 import (
 	"slices"
 	"strings"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // NameGetter is an interface for objects that have a Name.
@@ -46,19 +44,4 @@ func ByNamespacedName[T any, PT interface {
 		}
 		return strings.Compare(pa.GetName(), pb.GetName())
 	})
-}
-
-// ObjectMetaWrapper wraps metav1.ObjectMeta to implement NamespaceGetter.
-type ObjectMetaWrapper struct {
-	metav1.ObjectMeta
-}
-
-// GetName returns the name.
-func (o *ObjectMetaWrapper) GetName() string {
-	return o.Name
-}
-
-// GetNamespace returns the namespace.
-func (o *ObjectMetaWrapper) GetNamespace() string {
-	return o.Namespace
 }
