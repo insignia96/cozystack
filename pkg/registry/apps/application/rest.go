@@ -42,6 +42,7 @@ import (
 
 	appsv1alpha1 "github.com/cozystack/cozystack/pkg/apis/apps/v1alpha1"
 	"github.com/cozystack/cozystack/pkg/config"
+	"github.com/cozystack/cozystack/pkg/registry/sorting"
 	internalapiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	structuralschema "k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
@@ -393,6 +394,8 @@ func (r *REST) List(ctx context.Context, options *metainternalversion.ListOption
 	appList := r.NewList().(*appsv1alpha1.ApplicationList)
 	appList.SetResourceVersion(hrList.GetResourceVersion())
 	appList.Items = items
+
+	sorting.ByNamespacedName[appsv1alpha1.Application, *appsv1alpha1.Application](appList.Items)
 
 	klog.V(6).Infof("Successfully listed %d Application resources in namespace %s", len(items), namespace)
 	return appList, nil

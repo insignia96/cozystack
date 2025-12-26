@@ -40,6 +40,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	corev1alpha1 "github.com/cozystack/cozystack/pkg/apis/core/v1alpha1"
+	"github.com/cozystack/cozystack/pkg/registry/sorting"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -287,6 +288,8 @@ func (r *REST) List(ctx context.Context, options *metainternalversion.ListOption
 	}
 	moduleList.SetResourceVersion(hrList.GetResourceVersion())
 	moduleList.Items = items
+
+	sorting.ByNamespacedName[corev1alpha1.TenantModule, *corev1alpha1.TenantModule](moduleList.Items)
 
 	klog.V(6).Infof("Successfully listed %d TenantModule resources in namespace %s", len(items), namespace)
 	return moduleList, nil
