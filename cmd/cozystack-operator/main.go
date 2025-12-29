@@ -20,7 +20,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -31,8 +30,9 @@ import (
 
 	cozyv1alpha1 "github.com/cozystack/cozystack/api/v1alpha1"
 	helmv2 "github.com/fluxcd/helm-controller/api/v2"
+	sourcev1 "github.com/fluxcd/source-controller/api/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -58,6 +58,7 @@ func init() {
 	utilruntime.Must(apiextensionsv1.AddToScheme(scheme))
 	utilruntime.Must(cozyv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(helmv2.AddToScheme(scheme))
+	utilruntime.Must(sourcev1.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 
@@ -69,8 +70,9 @@ func main() {
 	var enableHTTP2 bool
 	var installFlux bool
 	var cozystackVersion string
-	var platformSource string
+	var platformSourceURL string
 	var platformSourceName string
+	var platformSourceRef string
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
@@ -84,8 +86,9 @@ func main() {
 	flag.BoolVar(&installFlux, "install-flux", false, "Install Flux components before starting reconcile loop")
 	flag.StringVar(&cozystackVersion, "cozystack-version", "unknown",
 		"Version of Cozystack")
-	flag.StringVar(&platformSource, "platform-source", "", "Platform source URL (oci:// or git://). If specified, generates OCIRepository or GitRepository resource.")
+	flag.StringVar(&platformSourceURL, "platform-source-url", "", "Platform source URL (oci:// or https://). If specified, generates OCIRepository or GitRepository resource.")
 	flag.StringVar(&platformSourceName, "platform-source-name", "cozystack-packages", "Name for the generated platform source resource (default: cozystack-packages)")
+	flag.StringVar(&platformSourceRef, "platform-source-ref", "", "Reference specification as key=value pairs (e.g., 'branch=main' or 'digest=sha256:...,tag=v1.0'). For OCI: digest, semver, semverFilter, tag. For Git: branch, tag, semver, name, commit.")
 
 	opts := zap.Options{
 		Development: true,
@@ -96,6 +99,13 @@ func main() {
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
 	config := ctrl.GetConfigOrDie()
+
+	// Create a direct client (without cache) for pre-start operations
+	directClient, err := client.New(config, client.Options{Scheme: scheme})
+	if err != nil {
+		setupLog.Error(err, "unable to create direct client")
+		os.Exit(1)
+	}
 
 	// Start the controller manager
 	setupLog.Info("Starting controller manager")
@@ -133,8 +143,8 @@ func main() {
 		installCtx, installCancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer installCancel()
 
-		// The namespace will be automatically extracted from the embedded manifests
-		if err := fluxinstall.Install(installCtx, mgr.GetClient(), fluxinstall.WriteEmbeddedManifests); err != nil {
+		// Use direct client for pre-start operations (cache is not ready yet)
+		if err := fluxinstall.Install(installCtx, directClient, fluxinstall.WriteEmbeddedManifests); err != nil {
 			setupLog.Error(err, "failed to install Flux")
 			os.Exit(1)
 		}
@@ -142,12 +152,13 @@ func main() {
 	}
 
 	// Generate and install platform source resource if specified
-	if platformSource != "" {
-		setupLog.Info("Generating platform source resource", "source", platformSource, "name", platformSourceName)
+	if platformSourceURL != "" {
+		setupLog.Info("Generating platform source resource", "url", platformSourceURL, "name", platformSourceName, "ref", platformSourceRef)
 		installCtx, installCancel := context.WithTimeout(context.Background(), 2*time.Minute)
 		defer installCancel()
 
-		if err := installPlatformSourceResource(installCtx, mgr.GetClient(), platformSource, platformSourceName); err != nil {
+		// Use direct client for pre-start operations (cache is not ready yet)
+		if err := installPlatformSourceResource(installCtx, directClient, platformSourceURL, platformSourceName, platformSourceRef); err != nil {
 			setupLog.Error(err, "failed to install platform source resource")
 			os.Exit(1)
 		} else {
@@ -176,54 +187,56 @@ func main() {
 
 // installPlatformSourceResource generates and installs a Flux source resource (OCIRepository or GitRepository)
 // based on the platform source URL
-func installPlatformSourceResource(ctx context.Context, k8sClient client.Client, sourceURL, resourceName string) error {
+func installPlatformSourceResource(ctx context.Context, k8sClient client.Client, sourceURL, resourceName, refSpec string) error {
 	logger := log.FromContext(ctx)
 
 	// Parse the source URL to determine type
-	sourceType, repoURL, ref, err := parsePlatformSource(sourceURL)
+	sourceType, repoURL, err := parsePlatformSourceURL(sourceURL)
 	if err != nil {
 		return fmt.Errorf("failed to parse platform source URL: %w", err)
 	}
 
-	var obj *unstructured.Unstructured
+	// Parse reference specification
+	refMap, err := parseRefSpec(refSpec)
+	if err != nil {
+		return fmt.Errorf("failed to parse reference specification: %w", err)
+	}
+
+	var obj client.Object
 	switch sourceType {
 	case "oci":
-		obj, err = generateOCIRepository(resourceName, repoURL, ref)
+		obj, err = generateOCIRepository(resourceName, repoURL, refMap)
 		if err != nil {
 			return fmt.Errorf("failed to generate OCIRepository: %w", err)
 		}
 	case "git":
-		obj, err = generateGitRepository(resourceName, repoURL, ref)
+		obj, err = generateGitRepository(resourceName, repoURL, refMap)
 		if err != nil {
 			return fmt.Errorf("failed to generate GitRepository: %w", err)
 		}
 	default:
-		return fmt.Errorf("unsupported source type: %s (expected oci:// or git://)", sourceType)
+		return fmt.Errorf("unsupported source type: %s (expected oci:// or https://)", sourceType)
 	}
 
 	// Apply the resource (create or update)
 	logger.Info("Applying platform source resource",
-		"apiVersion", obj.GetAPIVersion(),
-		"kind", obj.GetKind(),
+		"apiVersion", obj.GetObjectKind().GroupVersionKind().GroupVersion().String(),
+		"kind", obj.GetObjectKind().GroupVersionKind().Kind,
 		"name", obj.GetName(),
 		"namespace", obj.GetNamespace(),
 	)
 
-	existing := &unstructured.Unstructured{}
-	existing.SetGroupVersionKind(obj.GroupVersionKind())
-	key := client.ObjectKey{
-		Name:      obj.GetName(),
-		Namespace: obj.GetNamespace(),
-	}
+	existing := obj.DeepCopyObject().(client.Object)
+	key := client.ObjectKeyFromObject(obj)
 
 	err = k8sClient.Get(ctx, key, existing)
 	if err != nil {
 		if client.IgnoreNotFound(err) == nil {
 			// Resource doesn't exist, create it
 			if err := k8sClient.Create(ctx, obj); err != nil {
-				return fmt.Errorf("failed to create resource %s/%s: %w", obj.GetKind(), obj.GetName(), err)
+				return fmt.Errorf("failed to create resource %s/%s: %w", obj.GetObjectKind().GroupVersionKind().Kind, obj.GetName(), err)
 			}
-			logger.Info("Created platform source resource", "kind", obj.GetKind(), "name", obj.GetName())
+			logger.Info("Created platform source resource", "kind", obj.GetObjectKind().GroupVersionKind().Kind, "name", obj.GetName())
 		} else {
 			return fmt.Errorf("failed to check if resource exists: %w", err)
 		}
@@ -231,132 +244,195 @@ func installPlatformSourceResource(ctx context.Context, k8sClient client.Client,
 		// Resource exists, update it
 		obj.SetResourceVersion(existing.GetResourceVersion())
 		if err := k8sClient.Update(ctx, obj); err != nil {
-			return fmt.Errorf("failed to update resource %s/%s: %w", obj.GetKind(), obj.GetName(), err)
+			return fmt.Errorf("failed to update resource %s/%s: %w", obj.GetObjectKind().GroupVersionKind().Kind, obj.GetName(), err)
 		}
-		logger.Info("Updated platform source resource", "kind", obj.GetKind(), "name", obj.GetName())
+		logger.Info("Updated platform source resource", "kind", obj.GetObjectKind().GroupVersionKind().Kind, "name", obj.GetName())
 	}
 
 	return nil
 }
 
-// parsePlatformSource parses the source URL and returns the type, repository URL, and reference
+// parsePlatformSourceURL parses the source URL and returns the source type and repository URL.
 // Supports formats:
-//   - oci://registry.example.com/repo@sha256:digest
-//   - oci://registry.example.com/repo (ref will be empty)
-//   - git://github.com/user/repo@branch
-//   - git://github.com/user/repo (ref will default to "main")
-//   - https://github.com/user/repo@branch (treated as git)
-func parsePlatformSource(sourceURL string) (sourceType, repoURL, ref string, err error) {
-	// Normalize the URL by trimming whitespace
+//   - oci://registry.example.com/repo
+//   - https://github.com/user/repo
+//   - http://github.com/user/repo
+//   - ssh://git@github.com/user/repo
+func parsePlatformSourceURL(sourceURL string) (sourceType, repoURL string, err error) {
 	sourceURL = strings.TrimSpace(sourceURL)
 
-	// Check for oci:// prefix
 	if strings.HasPrefix(sourceURL, "oci://") {
-		// Remove oci:// prefix
-		rest := strings.TrimPrefix(sourceURL, "oci://")
-
-		// Check for @sha256: digest (look for @ followed by sha256:)
-		// We need to find the last @ before sha256: to handle paths with @ symbols
-		sha256Idx := strings.LastIndex(rest, "@sha256:")
-		if sha256Idx != -1 {
-			repoURL = "oci://" + rest[:sha256Idx]
-			ref = rest[sha256Idx+1:] // sha256:digest
-		} else {
-			// Check for @ without sha256: (might be a tag)
-			if atIdx := strings.LastIndex(rest, "@"); atIdx != -1 {
-				// Could be a tag, but for OCI we expect sha256: digest
-				// For now, treat everything after @ as the ref
-				repoURL = "oci://" + rest[:atIdx]
-				ref = rest[atIdx+1:]
-			} else {
-				repoURL = "oci://" + rest
-				ref = "" // No digest specified
-			}
-		}
-		return "oci", repoURL, ref, nil
+		return "oci", sourceURL, nil
 	}
 
-	// Check for git:// prefix or treat as git for http/https
-	if strings.HasPrefix(sourceURL, "git://") || strings.HasPrefix(sourceURL, "http://") || strings.HasPrefix(sourceURL, "https://") || strings.HasPrefix(sourceURL, "ssh://") {
-		// Parse URL to extract ref if present
-		parsedURL, err := url.Parse(sourceURL)
-		if err != nil {
-			return "", "", "", fmt.Errorf("invalid URL: %w", err)
-		}
-
-		// Check for @ref in the path (e.g., git://host/path@branch)
-		path := parsedURL.Path
-		if idx := strings.LastIndex(path, "@"); idx != -1 {
-			repoURL = fmt.Sprintf("%s://%s%s", parsedURL.Scheme, parsedURL.Host, path[:idx])
-			if parsedURL.RawQuery != "" {
-				repoURL += "?" + parsedURL.RawQuery
-			}
-			ref = path[idx+1:]
-		} else {
-			// Default to main branch if no ref specified
-			repoURL = sourceURL
-			ref = "main"
-		}
-
-		// Normalize git:// to https:// for GitRepository
-		if strings.HasPrefix(repoURL, "git://") {
-			repoURL = strings.Replace(repoURL, "git://", "https://", 1)
-		}
-
-		return "git", repoURL, ref, nil
+	if strings.HasPrefix(sourceURL, "https://") || strings.HasPrefix(sourceURL, "http://") || strings.HasPrefix(sourceURL, "ssh://") {
+		return "git", sourceURL, nil
 	}
 
-	return "", "", "", fmt.Errorf("unsupported source URL scheme (expected oci:// or git://): %s", sourceURL)
+	return "", "", fmt.Errorf("unsupported source URL scheme (expected oci://, https://, http://, or ssh://): %s", sourceURL)
+}
+
+// parseRefSpec parses a reference specification string in the format "key1=value1,key2=value2".
+// Returns a map of key-value pairs.
+func parseRefSpec(refSpec string) (map[string]string, error) {
+	result := make(map[string]string)
+
+	refSpec = strings.TrimSpace(refSpec)
+	if refSpec == "" {
+		return result, nil
+	}
+
+	pairs := strings.Split(refSpec, ",")
+	for _, pair := range pairs {
+		pair = strings.TrimSpace(pair)
+		if pair == "" {
+			continue
+		}
+
+		// Split on first '=' only to allow '=' in values (e.g., digest=sha256:...)
+		idx := strings.Index(pair, "=")
+		if idx == -1 {
+			return nil, fmt.Errorf("invalid reference specification format: %q (expected key=value)", pair)
+		}
+
+		key := strings.TrimSpace(pair[:idx])
+		value := strings.TrimSpace(pair[idx+1:])
+
+		if key == "" {
+			return nil, fmt.Errorf("empty key in reference specification: %q", pair)
+		}
+		if value == "" {
+			return nil, fmt.Errorf("empty value for key %q in reference specification", key)
+		}
+
+		result[key] = value
+	}
+
+	return result, nil
+}
+
+// Valid reference keys for OCI repositories
+var validOCIRefKeys = map[string]bool{
+	"digest":       true,
+	"semver":       true,
+	"semverFilter": true,
+	"tag":          true,
+}
+
+// Valid reference keys for Git repositories
+var validGitRefKeys = map[string]bool{
+	"branch": true,
+	"tag":    true,
+	"semver": true,
+	"name":   true,
+	"commit": true,
+}
+
+// validateOCIRef validates reference keys for OCI repositories
+func validateOCIRef(refMap map[string]string) error {
+	for key := range refMap {
+		if !validOCIRefKeys[key] {
+			return fmt.Errorf("invalid OCI reference key %q (valid keys: digest, semver, semverFilter, tag)", key)
+		}
+	}
+
+	// Validate digest format if provided
+	if digest, ok := refMap["digest"]; ok {
+		if !strings.HasPrefix(digest, "sha256:") {
+			return fmt.Errorf("digest must be in format 'sha256:<hash>', got: %s", digest)
+		}
+	}
+
+	return nil
+}
+
+// validateGitRef validates reference keys for Git repositories
+func validateGitRef(refMap map[string]string) error {
+	for key := range refMap {
+		if !validGitRefKeys[key] {
+			return fmt.Errorf("invalid Git reference key %q (valid keys: branch, tag, semver, name, commit)", key)
+		}
+	}
+
+	// Validate commit format if provided (should be a hex string)
+	if commit, ok := refMap["commit"]; ok {
+		if len(commit) < 7 {
+			return fmt.Errorf("commit SHA should be at least 7 characters, got: %s", commit)
+		}
+		for _, c := range commit {
+			if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+				return fmt.Errorf("commit SHA should be a hexadecimal string, got: %s", commit)
+			}
+		}
+	}
+
+	return nil
 }
 
 // generateOCIRepository creates an OCIRepository resource
-func generateOCIRepository(name, repoURL, digest string) (*unstructured.Unstructured, error) {
-	obj := &unstructured.Unstructured{}
-	obj.SetAPIVersion("source.toolkit.fluxcd.io/v1")
-	obj.SetKind("OCIRepository")
-	obj.SetName(name)
-	obj.SetNamespace("cozy-system")
-
-	spec := map[string]interface{}{
-		"interval": "5m0s",
-		"url":      repoURL,
+func generateOCIRepository(name, repoURL string, refMap map[string]string) (*sourcev1.OCIRepository, error) {
+	if err := validateOCIRef(refMap); err != nil {
+		return nil, err
 	}
 
-	if digest != "" {
-		// Ensure digest starts with sha256:
-		if !strings.HasPrefix(digest, "sha256:") {
-			digest = "sha256:" + digest
-		}
-		spec["ref"] = map[string]interface{}{
-			"digest": digest,
-		}
+	obj := &sourcev1.OCIRepository{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: sourcev1.GroupVersion.String(),
+			Kind:       sourcev1.OCIRepositoryKind,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: "cozy-system",
+		},
+		Spec: sourcev1.OCIRepositorySpec{
+			URL:      repoURL,
+			Interval: metav1.Duration{Duration: 5 * time.Minute},
+		},
 	}
 
-	if err := unstructured.SetNestedField(obj.Object, spec, "spec"); err != nil {
-		return nil, fmt.Errorf("failed to set spec: %w", err)
+	// Set reference if any ref options are provided
+	if len(refMap) > 0 {
+		obj.Spec.Reference = &sourcev1.OCIRepositoryRef{
+			Digest:       refMap["digest"],
+			SemVer:       refMap["semver"],
+			SemverFilter: refMap["semverFilter"],
+			Tag:          refMap["tag"],
+		}
 	}
 
 	return obj, nil
 }
 
 // generateGitRepository creates a GitRepository resource
-func generateGitRepository(name, repoURL, ref string) (*unstructured.Unstructured, error) {
-	obj := &unstructured.Unstructured{}
-	obj.SetAPIVersion("source.toolkit.fluxcd.io/v1")
-	obj.SetKind("GitRepository")
-	obj.SetName(name)
-	obj.SetNamespace("cozy-system")
+func generateGitRepository(name, repoURL string, refMap map[string]string) (*sourcev1.GitRepository, error) {
+	if err := validateGitRef(refMap); err != nil {
+		return nil, err
+	}
 
-	spec := map[string]interface{}{
-		"interval": "5m0s",
-		"url":      repoURL,
-		"ref": map[string]interface{}{
-			"branch": ref,
+	obj := &sourcev1.GitRepository{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: sourcev1.GroupVersion.String(),
+			Kind:       sourcev1.GitRepositoryKind,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: "cozy-system",
+		},
+		Spec: sourcev1.GitRepositorySpec{
+			URL:      repoURL,
+			Interval: metav1.Duration{Duration: 5 * time.Minute},
 		},
 	}
 
-	if err := unstructured.SetNestedField(obj.Object, spec, "spec"); err != nil {
-		return nil, fmt.Errorf("failed to set spec: %w", err)
+	// Set reference if any ref options are provided
+	if len(refMap) > 0 {
+		obj.Spec.Reference = &sourcev1.GitRepositoryRef{
+			Branch: refMap["branch"],
+			Tag:    refMap["tag"],
+			SemVer: refMap["semver"],
+			Name:   refMap["name"],
+			Commit: refMap["commit"],
+		}
 	}
 
 	return obj, nil
