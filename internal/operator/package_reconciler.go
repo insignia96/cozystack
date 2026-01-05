@@ -37,6 +37,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
+const (
+	// AnnotationSkipCozystackValues disables injection of cozystack-values secret into HelmRelease
+	// This annotation should be placed on PackageSource
+	AnnotationSkipCozystackValues = "operator.cozystack.io/skip-cozystack-values"
+	// SecretCozystackValues is the name of the secret containing cluster and namespace configuration
+	SecretCozystackValues = "cozystack-values"
+)
+
 // PackageReconciler reconciles Package resources
 type PackageReconciler struct {
 	client.Client
@@ -213,6 +221,16 @@ func (r *PackageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 					},
 				},
 			},
+		}
+
+		// Add valuesFrom for cozystack-values secret unless disabled by annotation on PackageSource
+		if packageSource.GetAnnotations()[AnnotationSkipCozystackValues] != "true" {
+			hr.Spec.ValuesFrom = []helmv2.ValuesReference{
+				{
+					Kind: "Secret",
+					Name: SecretCozystackValues,
+				},
+			}
 		}
 
 		// Set ownerReference
