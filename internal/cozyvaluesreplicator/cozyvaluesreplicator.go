@@ -20,14 +20,18 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -164,13 +168,105 @@ func isSourceSecret(obj client.Object, r *SecretReplicatorReconciler) bool {
 }
 
 func (r *SecretReplicatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
+	// Ignore requests that don't match our secret name or are for the source namespace
 	if req.Name != r.SecretName || req.Namespace == r.SourceNamespace {
 		return ctrl.Result{}, nil
 	}
+
+	// Verify the target namespace still exists and matches the selector
+	targetNamespace := &corev1.Namespace{}
+	if err := r.Get(ctx, types.NamespacedName{Name: req.Namespace}, targetNamespace); err != nil {
+		if apierrors.IsNotFound(err) {
+			// Namespace doesn't exist, nothing to do
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, "Failed to get target namespace", "namespace", req.Namespace)
+		return ctrl.Result{}, err
+	}
+
+	// Check if namespace still matches the selector
+	if r.TargetNamespaceSelector != nil && !r.TargetNamespaceSelector.Matches(labels.Set(targetNamespace.Labels)) {
+		// Namespace no longer matches selector, delete the replicated secret if it exists
+		replicatedSecret := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: req.Namespace,
+				Name:      req.Name,
+			},
+		}
+		if err := r.Delete(ctx, replicatedSecret); err != nil && !apierrors.IsNotFound(err) {
+			logger.Error(err, "Failed to delete replicated secret from non-matching namespace",
+				"namespace", req.Namespace, "secret", req.Name)
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
+
+	// Get the source secret
 	originalSecret := &corev1.Secret{}
-	r.Get(ctx, types.NamespacedName{Namespace: r.SourceNamespace, Name: r.SecretName}, originalSecret)
-	replicatedSecret := originalSecret.DeepCopy()
-	replicatedSecret.Namespace = req.Namespace
-	r.Update(ctx, replicatedSecret)
+	if err := r.Get(ctx, types.NamespacedName{Namespace: r.SourceNamespace, Name: r.SecretName}, originalSecret); err != nil {
+		if apierrors.IsNotFound(err) {
+			// Source secret doesn't exist, delete the replicated secret if it exists
+			replicatedSecret := &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: req.Namespace,
+					Name:      req.Name,
+				},
+			}
+			if err := r.Delete(ctx, replicatedSecret); err != nil && !apierrors.IsNotFound(err) {
+				logger.Error(err, "Failed to delete replicated secret after source secret deletion",
+					"namespace", req.Namespace, "secret", req.Name)
+				return ctrl.Result{}, err
+			}
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, "Failed to get source secret",
+			"namespace", r.SourceNamespace, "secret", r.SecretName)
+		return ctrl.Result{}, err
+	}
+
+	// Create or update the replicated secret
+	replicatedSecret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: req.Namespace,
+			Name:      req.Name,
+		},
+	}
+
+	_, err := controllerutil.CreateOrUpdate(ctx, r.Client, replicatedSecret, func() error {
+		// Copy the secret data and type from the source
+		replicatedSecret.Data = make(map[string][]byte)
+		for k, v := range originalSecret.Data {
+			replicatedSecret.Data[k] = v
+		}
+		replicatedSecret.Type = originalSecret.Type
+
+		// Copy labels and annotations from source (if any)
+		if originalSecret.Labels != nil {
+			if replicatedSecret.Labels == nil {
+				replicatedSecret.Labels = make(map[string]string)
+			}
+			for k, v := range originalSecret.Labels {
+				replicatedSecret.Labels[k] = v
+			}
+		}
+		if originalSecret.Annotations != nil {
+			if replicatedSecret.Annotations == nil {
+				replicatedSecret.Annotations = make(map[string]string)
+			}
+			for k, v := range originalSecret.Annotations {
+				replicatedSecret.Annotations[k] = v
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		logger.Error(err, "Failed to create or update replicated secret",
+			"namespace", req.Namespace, "secret", req.Name)
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
 }
