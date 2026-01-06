@@ -83,6 +83,8 @@ apiVersion: cozystack.io/v1alpha1
 kind: PackageSource
 metadata:
   name: cozystack.cozystack-platform
+  annotations:
+    operator.cozystack.io/skip-cozystack-values: "true"
 spec:
   sourceRef:
     kind: OCIRepository
