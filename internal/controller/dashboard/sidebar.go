@@ -115,6 +115,12 @@ func (m *Manager) ensureSidebar(ctx context.Context, crd *cozyv1alpha1.Cozystack
 	// Add sidebar for backups.cozystack.io Plan resource
 	keysAndTags["plans"] = []any{"plan-sidebar"}
 
+	// Add sidebar for backups.cozystack.io BackupJob resource
+	keysAndTags["backupjobs"] = []any{"backupjob-sidebar"}
+
+	// Add sidebar for backups.cozystack.io Backup resource
+	keysAndTags["backups"] = []any{"backup-sidebar"}
+
 	// 3) Sort items within each category by Weight (desc), then Label (A→Z)
 	for cat := range categories {
 		sort.Slice(categories[cat], func(i, j int) bool {
@@ -176,6 +182,16 @@ func (m *Manager) ensureSidebar(ctx context.Context, crd *cozyv1alpha1.Cozystack
 				"label": "Plans",
 				"link":  "/openapi-ui/{clusterName}/{namespace}/api-table/backups.cozystack.io/v1alpha1/plans",
 			},
+			map[string]any{
+				"key":   "backupjobs",
+				"label": "BackupJobs",
+				"link":  "/openapi-ui/{clusterName}/{namespace}/api-table/backups.cozystack.io/v1alpha1/backupjobs",
+			},
+			map[string]any{
+				"key":   "backups",
+				"label": "Backups",
+				"link":  "/openapi-ui/{clusterName}/{namespace}/api-table/backups.cozystack.io/v1alpha1/backups",
+			},
 		},
 	})
 
@@ -218,6 +234,8 @@ func (m *Manager) ensureSidebar(ctx context.Context, crd *cozyv1alpha1.Cozystack
 		"stock-project-factory-kube-secret-details",
 		"stock-project-factory-kube-ingress-details",
 		"stock-project-factory-plan-details",
+		"stock-project-factory-backupjob-details",
+		"stock-project-factory-backup-details",
 		"stock-project-api-form",
 		"stock-project-api-table",
 		"stock-project-builtin-form",
